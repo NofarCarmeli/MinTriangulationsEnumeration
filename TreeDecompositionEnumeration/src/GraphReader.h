@@ -15,6 +15,10 @@ public:
 	 * All values are separated by spaces.
 	 */
 	static Graph read();
+	/**
+	 * Reads a graph specified in the DIMACS format.
+	 */
+	static Graph readCnf(bool isWeighted);
 };
 
 } /* namespace tdenum */
