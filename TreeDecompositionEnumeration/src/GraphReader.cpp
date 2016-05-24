@@ -7,20 +7,21 @@ using namespace std;
 
 namespace tdenum {
 
-Graph GraphReader::read() {
-
+Graph readCliques() {
+	// Get numbers of variables and clauses
 	string line;
 	getline(cin, line);
 	istringstream lineStream(line);
 	int numberOfNodes, numberOfCliques;
 	lineStream >> numberOfNodes;
 	lineStream >> numberOfCliques;
-
+	// Get cliques
 	Graph g(numberOfNodes);
-
 	for (int i=0; i<numberOfCliques; i++) {
 		getline(cin, line);
 		istringstream lineStream(line);
+		int nodesInClique;
+		lineStream >> nodesInClique;
 		NodeSet clique;
 		Node v;
 		while(lineStream >> v) {
@@ -28,19 +29,28 @@ Graph GraphReader::read() {
 		}
 		g.addClique(clique);
 	}
-
 	return g;
 }
 
-Graph GraphReader::readCnf(bool isWeighted) {
+Graph readCnf() {
 	string line;
 	getline(cin, line);
 	// Skip comments
 	while (line[0] == 'c') {
 		getline(cin, line);
 	}
-	// Skip beginning of line ("p wcnf "), and get numbers of variables and clauses
+	// Determine if weighted
+	bool isWeighted;
 	istringstream lineStream(line);
+	if (line.find("p cnf") != string::npos) {
+		isWeighted = false;
+	} else if (line.find("p wcnf") != string::npos) {
+		isWeighted = true;
+	} else {
+		cout << "Parsing error" << endl;
+		return Graph();
+	}
+	// Skip beginning of line ("p wcnf "), and get numbers of variables and clauses.
 	while (lineStream.peek() > '9' || lineStream.peek() < '0') {
 		lineStream.get();
 	}
@@ -65,6 +75,14 @@ Graph GraphReader::readCnf(bool isWeighted) {
 		g.addClique(clique);
 	}
 	return g;
+}
+
+Graph GraphReader::read() {
+	if (cin.peek() == 'c' || cin.peek() == 'p') {
+		return readCnf();
+	} else {
+		return readCliques();
+	}
 }
 
 } /* namespace tdenum */
