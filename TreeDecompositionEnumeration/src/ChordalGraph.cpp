@@ -15,7 +15,11 @@ ChordalGraph::ChordalGraph(const Graph& g) : Graph(g) {}
 
 ChordalGraph::~ChordalGraph() {}
 
-void ChordalGraph::printTriangulation(const Graph& origin) {
+int ChordalGraph::getFillIn(const Graph& origin) const {
+	return getNumberOfEdges() - origin.getNumberOfEdges();
+}
+
+void ChordalGraph::printTriangulation(const Graph& origin) const {
 	NodeSet nodes = getNodes();
 	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
 		NodeSet neighbors = getNeighbors(*i);

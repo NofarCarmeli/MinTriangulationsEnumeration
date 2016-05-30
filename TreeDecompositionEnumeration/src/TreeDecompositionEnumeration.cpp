@@ -28,6 +28,7 @@ int main() {
 
 		cout << "Triangulation #" << resultNumber << ":" << endl;
 		triangulation.printTriangulation(g);
+		cout << triangulation.getFillIn(g) << " fill edges" << endl;
 		printTimeElapsed(lastTime);
 		cout << endl;
 

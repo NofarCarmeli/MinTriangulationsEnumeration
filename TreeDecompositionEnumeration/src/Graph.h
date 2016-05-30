@@ -33,6 +33,8 @@ public:
 
 	// Returns the nodes of the graph
 	NodeSet getNodes() const;
+	// Returns the number of edges in the graph
+	int getNumberOfEdges() const;
 	// Returns the neighbors of the given node
 	NodeSet getNeighbors(Node v) const;
 	// Returns the neighbors of the given node set
