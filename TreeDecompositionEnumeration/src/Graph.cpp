@@ -4,10 +4,10 @@
 
 namespace tdenum {
 
-Graph::Graph() : numberOfNodes(0) {}
+Graph::Graph() : numberOfNodes(0), numberOfEdges(0) {}
 
-Graph::Graph(int numberOfNodes) :
-		numberOfNodes(numberOfNodes), neighborSets(numberOfNodes) {}
+Graph::Graph(int numberOfNodes) : numberOfNodes(numberOfNodes), numberOfEdges(0),
+		neighborSets(numberOfNodes) {}
 
 void Graph::addClique(const NodeSet& newClique) {
 	for (NodeSetIterator i = newClique.begin(); i != newClique.end(); ++i) {
@@ -18,8 +18,11 @@ void Graph::addClique(const NodeSet& newClique) {
 				return;
 			}
 			if (u < v) {
-				neighborSets[u].insert(v);
-				neighborSets[v].insert(u);
+				if (neighborSets[u].count(v) == 0) {
+					neighborSets[u].insert(v);
+					neighborSets[v].insert(u);
+					numberOfEdges++;
+				}
 			}
 		}
 	}

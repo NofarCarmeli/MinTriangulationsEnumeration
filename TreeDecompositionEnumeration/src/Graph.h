@@ -15,6 +15,7 @@ typedef NodeSet MinimalSeparator;
 
 class Graph {
 	int numberOfNodes;
+	int numberOfEdges;
 	vector<NodeSet> neighborSets;
 
 	bool isValidNode(Node v) const;
