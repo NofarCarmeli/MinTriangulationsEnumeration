@@ -20,7 +20,7 @@ bool MinimalTriangulationsEnumerator::hasNext(){
 /*
  * Returns another minimal triangulation
  */
-Graph MinimalTriangulationsEnumerator::next() {
+ChordalGraph MinimalTriangulationsEnumerator::next() {
 	return Converter::minimalSeparatorsToTriangulation(graph, setsEnumerator.next());
 }
 

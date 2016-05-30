@@ -1,7 +1,7 @@
 #ifndef MINIMALTRIANGULATOR_H_
 #define MINIMALTRIANGULATOR_H_
 
-#include "Graph.h"
+#include "ChordalGraph.h"
 
 namespace tdenum {
 
@@ -11,7 +11,7 @@ namespace tdenum {
 class MinimalTriangulator {
 public:
 	MinimalTriangulator();
-	Graph triangulate(const Graph& g);
+	ChordalGraph triangulate(const Graph& g);
 };
 
 } /* namespace tdenum */

@@ -22,7 +22,7 @@ public:
 	// Checks whether there is another minimal triangulation
 	bool hasNext();
 	// Returns another minimal triangulation
-	Graph next();
+	ChordalGraph next();
 };
 
 } /* namespace tdenum */

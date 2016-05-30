@@ -21,13 +21,13 @@ int main() {
 
 	startTime = clock();
 	while (enumerator.hasNext()) {
-		Graph triangulation = enumerator.next();
+		ChordalGraph triangulation = enumerator.next();
 		endTime = clock();
 		double lastTime = difftime(endTime, startTime);
 		totalTime += lastTime;
 
 		cout << "Triangulation #" << resultNumber << ":" << endl;
-		triangulation.print();
+		triangulation.printTriangulation(g);
 		printTimeElapsed(lastTime);
 		cout << endl;
 

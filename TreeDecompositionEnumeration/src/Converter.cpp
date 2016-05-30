@@ -8,9 +8,9 @@ namespace tdenum {
 /*
  * Returns the triangulation of g obtained by saturating the given minimal separators
  */
-Graph Converter::minimalSeparatorsToTriangulation(const Graph& g,
+ChordalGraph Converter::minimalSeparatorsToTriangulation(const Graph& g,
 		const set<MinimalSeparator>& minimalSeparators) {
-	Graph triangulation(g);
+	ChordalGraph triangulation(g);
 	triangulation.saturateNodeSets(minimalSeparators);
 	return triangulation;
 }
@@ -27,7 +27,8 @@ Graph Converter::minimalSeparatorsToTriangulation(const Graph& g,
  * is smaller or equal to the previous weight, these neighbors form a minimal
  * separator.
  */
-set<MinimalSeparator> Converter::triangulationToMinimalSeparators(const Graph& g) {
+set<MinimalSeparator> Converter::triangulationToMinimalSeparators(
+		const ChordalGraph& g) {
 	// initialize structures
 	set<MinimalSeparator> minimalSeparators; // holds the result
 	map<Node, int> weight; // default is zero

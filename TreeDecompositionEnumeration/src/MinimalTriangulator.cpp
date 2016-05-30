@@ -8,9 +8,9 @@ MinimalTriangulator::MinimalTriangulator() {}
 /*
  * Calculates minimal triangulation by implementing MSC-M
  */
-Graph MinimalTriangulator::triangulate(const Graph& g) {
+ChordalGraph MinimalTriangulator::triangulate(const Graph& g) {
 	// initialize structures
-	Graph triangulation(g); // holds the result
+	ChordalGraph triangulation(g); // holds the result
 	map<Node, int> weight; // default is zero
 	set< pair<int,Node> > mcsQueue;
 	NodeSet visited;

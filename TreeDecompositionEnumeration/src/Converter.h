@@ -2,6 +2,7 @@
 #define CONVERTER_H_
 
 #include "Graph.h"
+#include "ChordalGraph.h"
 #include <set>
 
 namespace tdenum {
@@ -20,7 +21,7 @@ public:
 	 * Receives a graph and a set of maximal non crossing minimal separators,
 	 * and returns the minimal triangulation obtained by saturating its bags.
 	 */
-	static Graph minimalSeparatorsToTriangulation(const Graph& g,
+	static ChordalGraph minimalSeparatorsToTriangulation(const Graph& g,
 			const set<MinimalSeparator>& minimalSeparators);
 	/**
 	 * Receives a chordal graph, and returns its minimal separators.
@@ -28,7 +29,7 @@ public:
 	 * maximal set of not crossing minimal separators.
 	 */
 	static set<MinimalSeparator> triangulationToMinimalSeparators(
-			const Graph& triangulation);
+			const ChordalGraph& triangulation);
 };
 
 } /* namespace tdenum */
