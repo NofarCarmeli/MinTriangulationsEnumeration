@@ -181,27 +181,16 @@ set<NodeSet> Graph::getComponentsAux(vector<int> visitedList, int numberOfUnhand
 	return components;
 }
 
-void print(const NodeSet& s) {
-	cout << "{ ";
-	for (NodeSetIterator it = s.begin(); it!=s.end(); ++it) {
-		cout << *it << " ";
-	}
-	cout << "}" << endl;
-}
-
-void print(const set<NodeSet>& s) {
-	cout << "{" << endl;
-	for (set<NodeSet>::iterator it = s.begin(); it!=s.end(); ++it) {
-		print(*it);
-	}
-	cout << "}" << endl;
-}
-
 void Graph::print() {
 	NodeSet nodes = getNodes();
 	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
 		cout << *i << " has neighbors: ";
-		tdenum::print(getNeighbors(*i));
+		NodeSet s = getNeighbors(*i);
+		cout << "{ ";
+		for (NodeSetIterator jt = s.begin(); jt!=s.end(); ++jt) {
+			cout << *jt << " ";
+		}
+		cout << "}" << endl;
 	}
 }
 

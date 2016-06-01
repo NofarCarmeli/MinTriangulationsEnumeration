@@ -20,6 +20,10 @@ public:
 	virtual ~ChordalGraph();
 	// If this is a triangulation of origin, returns the number of fill edges
 	int getFillIn(const Graph& origin) const;
+	// Returns the maximal cliques of the graph
+	set<NodeSet> getMaximalCliques() const;
+	// Returns the tree-width of the graph
+	int getTreeWidth() const;
 	// Prints the edges in this graph and not in the origin
 	void printTriangulation(const Graph& origin) const;
 };

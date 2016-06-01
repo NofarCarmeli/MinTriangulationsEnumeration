@@ -29,6 +29,7 @@ int main() {
 		cout << "Triangulation #" << resultNumber << ":" << endl;
 		triangulation.printTriangulation(g);
 		cout << triangulation.getFillIn(g) << " fill edges" << endl;
+		cout << "Tree-width is " << triangulation.getTreeWidth() << endl;
 		printTimeElapsed(lastTime);
 		cout << endl;
 
