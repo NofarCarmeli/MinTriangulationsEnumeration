@@ -77,9 +77,44 @@ Graph readCnf() {
 	return g;
 }
 
+Graph readUAI() {
+	// Ignore the line "MARKOV"
+	string line;
+	getline(cin, line);
+	// Get numbers of variables
+	getline(cin, line);
+	istringstream variableLineStream(line);
+	int numberOfNodes;
+	variableLineStream >> numberOfNodes;
+	// Ignore the cardinalities
+	getline(cin, line);
+	// Get number of cliques
+	getline(cin, line);
+	istringstream cliquesLineStream(line);
+	int numberOfCliques;
+	cliquesLineStream >> numberOfCliques;
+	// Get cliques
+	Graph g(numberOfNodes);
+	for (int i=0; i<numberOfCliques; i++) {
+		getline(cin, line);
+		istringstream lineStream(line);
+		int nodesInClique;
+		lineStream >> nodesInClique;
+		NodeSet clique;
+		Node v;
+		while(lineStream >> v) {
+			clique.insert(v);
+		}
+		g.addClique(clique);
+	}
+	return g;
+}
+
 Graph GraphReader::read() {
 	if (cin.peek() == 'c' || cin.peek() == 'p') {
 		return readCnf();
+	} else if (cin.peek() == 'M') {
+		return readUAI();
 	} else {
 		return readCliques();
 	}
