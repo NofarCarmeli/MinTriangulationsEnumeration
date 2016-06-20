@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -111,6 +112,36 @@ Graph readUAI(ifstream& input) {
 	return g;
 }
 
+Graph readCSV(ifstream& input) {
+	map <string,int> nodeNames;
+	vector < set<int> > edges;
+	// Get nodes and edges
+	string line;
+	while (getline(input, line)) {
+		istringstream lineStream(line);
+		string nodeName;
+		set<int> edge;
+		while (getline(lineStream, nodeName, ',' )) {
+			map<string,int>::iterator nameSearchResult = nodeNames.find(nodeName);
+			int nodeNumber;
+			if (nameSearchResult == nodeNames.end()) {
+				nodeNumber = nodeNames.size();
+				nodeNames[nodeName] = nodeNumber;
+			} else {
+				nodeNumber = nameSearchResult->second;
+			}
+			edge.insert(nodeNumber);
+		}
+		edges.push_back(edge);
+	}
+	// Construct graph
+	Graph g(nodeNames.size());
+	for (int i=0; i<(int)edges.size(); i++) {
+		g.addClique(edges[i]);
+	}
+	return g;
+}
+
 string GetFileExtension(const string& fileName) {
     if(fileName.find_last_of(".") != string::npos)
         return fileName.substr(fileName.find_last_of(".")+1);
@@ -130,6 +161,8 @@ Graph GraphReader::read(const string& fileName) {
 		return readCnf(input);
 	} else if ( extension == "uai" ) {
 		return readUAI(input);
+	} else if ( extension == "csv" ) {
+		return readCSV(input);
 	}
 	cout << "Unrecognized file extension" << endl;
 	return Graph();
