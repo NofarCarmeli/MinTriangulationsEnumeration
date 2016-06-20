@@ -1,5 +1,6 @@
 #include "GraphReader.h"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -7,10 +8,10 @@ using namespace std;
 
 namespace tdenum {
 
-Graph readCliques() {
+Graph readCliques(ifstream& input) {
 	// Get numbers of variables and clauses
 	string line;
-	getline(cin, line);
+	getline(input, line);
 	istringstream lineStream(line);
 	int numberOfNodes, numberOfCliques;
 	lineStream >> numberOfNodes;
@@ -18,7 +19,7 @@ Graph readCliques() {
 	// Get cliques
 	Graph g(numberOfNodes);
 	for (int i=0; i<numberOfCliques; i++) {
-		getline(cin, line);
+		getline(input, line);
 		istringstream lineStream(line);
 		int nodesInClique;
 		lineStream >> nodesInClique;
@@ -32,12 +33,12 @@ Graph readCliques() {
 	return g;
 }
 
-Graph readCnf() {
+Graph readCnf(ifstream& input) {
 	string line;
-	getline(cin, line);
+	getline(input, line);
 	// Skip comments
 	while (line[0] == 'c') {
-		getline(cin, line);
+		getline(input, line);
 	}
 	// Determine if weighted
 	bool isWeighted;
@@ -59,7 +60,7 @@ Graph readCnf() {
 	// Get clauses and create graph
 	Graph g(numberOfNodes);
 	for (int i=0; i<numberOfCliques; i++) {
-		getline(cin, line);
+		getline(input, line);
 		istringstream lineStream(line);
 		if (isWeighted) {
 			int weight;
@@ -77,26 +78,26 @@ Graph readCnf() {
 	return g;
 }
 
-Graph readUAI() {
+Graph readUAI(ifstream& input) {
 	// Ignore the line "MARKOV"
 	string line;
-	getline(cin, line);
+	getline(input, line);
 	// Get numbers of variables
-	getline(cin, line);
+	getline(input, line);
 	istringstream variableLineStream(line);
 	int numberOfNodes;
 	variableLineStream >> numberOfNodes;
 	// Ignore the cardinalities
-	getline(cin, line);
+	getline(input, line);
 	// Get number of cliques
-	getline(cin, line);
+	getline(input, line);
 	istringstream cliquesLineStream(line);
 	int numberOfCliques;
 	cliquesLineStream >> numberOfCliques;
 	// Get cliques
 	Graph g(numberOfNodes);
 	for (int i=0; i<numberOfCliques; i++) {
-		getline(cin, line);
+		getline(input, line);
 		istringstream lineStream(line);
 		int nodesInClique;
 		lineStream >> nodesInClique;
@@ -110,14 +111,28 @@ Graph readUAI() {
 	return g;
 }
 
-Graph GraphReader::read() {
-	if (cin.peek() == 'c' || cin.peek() == 'p') {
-		return readCnf();
-	} else if (cin.peek() == 'M') {
-		return readUAI();
-	} else {
-		return readCliques();
+string GetFileExtension(const string& fileName) {
+    if(fileName.find_last_of(".") != string::npos)
+        return fileName.substr(fileName.find_last_of(".")+1);
+    return "";
+}
+
+Graph GraphReader::read(const string& fileName) {
+	ifstream input (fileName.c_str());
+	if (!input.is_open()) {
+		cout << "Unable to open file" << endl;
+		return Graph();
 	}
+	string extension = GetFileExtension(fileName);
+	if ( extension == "hg" || extension == "sp") {
+		return readCliques(input);
+	} else if ( extension == "wcnf") {
+		return readCnf(input);
+	} else if ( extension == "uai" ) {
+		return readUAI(input);
+	}
+	cout << "Unrecognized file extension" << endl;
+	return Graph();
 }
 
 } /* namespace tdenum */

@@ -8,7 +8,7 @@ namespace tdenum {
 class GraphReader {
 public:
 	/**
-	 * Reads a graph from the standard input. Three supported options:
+	 * Reads a graph from the specified file. Three supported options:
 	 * 1. DIMACS format
 	 * 2. a Markov network in the UAI format
 	 * 3. First line is expected to have the number of nodes and then the number
@@ -16,7 +16,7 @@ public:
 	 * nodes in these cliques, and then specify their names. The names are
 	 * assumed to start from zero. All values are separated by spaces.
 	 */
-	static Graph read();
+	static Graph read(const string& fileName);
 };
 
 } /* namespace tdenum */

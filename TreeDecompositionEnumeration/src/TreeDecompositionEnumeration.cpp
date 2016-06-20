@@ -30,15 +30,31 @@ public:
 	}
 	int getFill() { return fill; }
 	int getWidth() { return treewidth; }
-	void print() {
+	void printDetails() {
 		cout << number << ") Time " << time << " millis, Tree-width "
 				<< treewidth << ", Fill-in " << fill << endl;
-		//triangulation.printTriangulation(origin); cout << endl;
+	}
+	void printEdges() {
+		triangulation.printTriangulation(origin);
+		cout << endl;
+	}
+	void printCsv() {
+		cout << number << ", " << time << ", "
+				<< treewidth << ", " << fill << endl;
+	}
+	static void printCsvHeader() {
+		cout << "result number, time in millis, tree-width, fill-in" << endl;
 	}
 };
 
-int main() {
-	Graph g = GraphReader::read();
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
+		cout << "No graph file specified" << endl;
+		return 0;
+	}
+
+	string fileName = argv[1];
+	Graph g = GraphReader::read(fileName);
 	clock_t startTime, endTime;
 	MinimalTriangulationsEnumerator enumerator(g);
 
@@ -48,7 +64,7 @@ int main() {
 	Result minWidth;
 	Result minFill;
 
-	double timeLimitInMillis = 10000;
+	double timeLimitInMillis = 360000;
 	bool timeLimitExceeded = false;
 
 	startTime = clock();
@@ -61,11 +77,12 @@ int main() {
 
 		Result res(resultNumber, totalTime, g, triangulation);
 		results.push_back(res);
-		res.print();
 
 		if (resultNumber == 1) {
 			minWidth = res;
 			minFill = res;
+			Result::printCsvHeader();
+			res.printCsv();
 		} else {
 			if (res.getWidth() < minWidth.getWidth()) {
 				minWidth = res;
@@ -73,6 +90,7 @@ int main() {
 			if (res.getFill() < minFill.getFill()) {
 				minFill = res;
 			}
+			res.printCsv();
 		}
 
 		if (clocksToMillis(totalTime) >= timeLimitInMillis) {
@@ -85,16 +103,16 @@ int main() {
 	}
 
 	if (timeLimitExceeded) {
-		cout << "Time limit reached" << endl << endl;
+		cout << endl << "Time limit reached" << endl;
 	} else {
-		cout << "All minimal triangulations were printed!" << endl << endl;
+		cout << endl << "All minimal triangulations were printed!" << endl;
 	}
 	cout << "First result: ";
-	results[0].print();
+	results[0].printDetails();
 	cout << "Lowest fill: ";
-	minFill.print();
+	minFill.printDetails();
 	cout << "Lowest tree-width: ";
-	minWidth.print();
+	minWidth.printDetails();
 	cout << "Total time " << clocksToMillis(totalTime) << " milliseconds" << endl;
 	return 0;
 }
