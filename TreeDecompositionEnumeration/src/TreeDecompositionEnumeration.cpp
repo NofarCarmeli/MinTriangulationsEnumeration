@@ -103,13 +103,13 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		res.printCsv(output);
+		resultNumber++;
 
 		if (isTimeLimited && clocksToMillis(totalTime) >= timeLimitInMillis) {
 			timeLimitExceeded = true;
 			break;
 		}
 
-		resultNumber++;
 		startTime = clock();
 	}
 	output.close();
