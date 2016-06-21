@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <cstdlib>
 #include "GraphReader.h"
 #include "MinimalTriangulationsEnumerator.h"
 using namespace std;
@@ -53,6 +54,12 @@ int main(int argc, char* argv[]) {
 		cout << "No graph file specified" << endl;
 		return 0;
 	}
+	bool isTimeLimited = false;
+	int timeLimitInMillis;
+	if (argc >= 3) {
+		isTimeLimited = true;
+		timeLimitInMillis = 1000 * atoi(argv[2]);
+	}
 
 	// Manage files
 	string inputFileName = argv[1];
@@ -68,7 +75,6 @@ int main(int argc, char* argv[]) {
 	vector<Result> results;
 	Result minWidth;
 	Result minFill;
-	double timeLimitInMillis = 360000;
 	bool timeLimitExceeded = false;
 
 	// generate and print the results to output file
@@ -98,7 +104,7 @@ int main(int argc, char* argv[]) {
 		}
 		res.printCsv(output);
 
-		if (clocksToMillis(totalTime) >= timeLimitInMillis) {
+		if (isTimeLimited && clocksToMillis(totalTime) >= timeLimitInMillis) {
 			timeLimitExceeded = true;
 			break;
 		}
