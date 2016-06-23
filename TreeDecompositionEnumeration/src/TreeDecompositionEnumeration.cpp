@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
@@ -7,34 +8,26 @@
 using namespace std;
 using namespace tdenum;
 
-double clocksToMillis(double timeElapsed) {
-	return (1000.0 * timeElapsed)/CLOCKS_PER_SEC;
-}
-
-double millisToclocks(double time) {
-	return (time * CLOCKS_PER_SEC) / 1000.0;
-}
 
 class Result {
 	int number;
 	double time;
 	int fill;
-	int treewidth;
+	int width;
 	Graph origin;
 	ChordalGraph triangulation;
 public:
-	Result() {}
+	Result() : number(0), time(0), fill(0), width(0) {}
 	Result(int index, double t, Graph g, ChordalGraph triangulation) :
-			number(index), origin(g), triangulation(triangulation) {
-		time = clocksToMillis(t);
+			number(index), time(t), origin(g), triangulation(triangulation) {
 		fill = triangulation.getFillIn(g);
-		treewidth = triangulation.getTreeWidth();
+		width = triangulation.getTreeWidth();
 	}
 	int getFill() { return fill; }
-	int getWidth() { return treewidth; }
+	int getWidth() { return width; }
 	void printDetails() {
-		cout << number << ") Time " << time << " millis, Tree-width "
-				<< treewidth << ", Fill-in " << fill << endl;
+		cout << "Result number " << number << ", Time " << time << " seconds, Width "
+				<< width << ", Fill " << fill << endl;
 	}
 	void printEdges() {
 		triangulation.printTriangulation(origin);
@@ -42,54 +35,58 @@ public:
 	}
 	void printCsv(ofstream& output) {
 		output << number << ", " << time << ", "
-				<< treewidth << ", " << fill << endl;
+				<< width << ", " << fill << endl;
 	}
 	static void printCsvHeader(ofstream& output) {
-		output << "result number, time in millis, tree-width, fill-in" << endl;
+		output << "result number, time in seconds, width, fill" << endl;
 	}
 };
 
+/**
+ * First parameter is the graph file path. Second is timeout in seconds.
+ */
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
 		cout << "No graph file specified" << endl;
 		return 0;
 	}
 	bool isTimeLimited = false;
-	int timeLimitInMillis;
+	int timeLimitInSeconds = -1;
 	if (argc >= 3) {
 		isTimeLimited = true;
-		timeLimitInMillis = 1000 * atoi(argv[2]);
+		timeLimitInSeconds = atoi(argv[2]);
 	}
 
 	// Manage files
+	clock_t startTime = clock();
 	string inputFileName = argv[1];
 	Graph g = GraphReader::read(inputFileName);
 	string outputFileName = inputFileName + ".output.csv";
 	ofstream output;
 	output.open(outputFileName.c_str());
+	cout << setprecision(2);
+	if (double(clock() - startTime) > 0) {
+		cout << "Reading the graph took " << double(clock() - startTime) / CLOCKS_PER_SEC
+				<< " seconds" << endl;
+	}
+	cout << "Starting enumeration" << endl;
 
 	// initialize variables
-	clock_t startTime, endTime;
 	int resultNumber = 1;
-	double totalTime = 0;
+	double totalTimeInSeconds = 0;
 	vector<Result> results;
-	Result minWidth;
-	Result minFill;
+	Result minWidth, minFill;
 	bool timeLimitExceeded = false;
+	startTime = clock();
 
 	// generate and print the results to output file
-	startTime = clock();
 	MinimalTriangulationsEnumerator enumerator(g);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
 
-		endTime = clock();
-		double lastTime = difftime(endTime, startTime);
-		totalTime += lastTime;
-
-		Result res(resultNumber, totalTime, g, triangulation);
+		totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
+		Result res(resultNumber, totalTimeInSeconds, g, triangulation);
 		results.push_back(res);
-
 		if (resultNumber == 1) {
 			minWidth = res;
 			minFill = res;
@@ -105,28 +102,26 @@ int main(int argc, char* argv[]) {
 		res.printCsv(output);
 		resultNumber++;
 
-		if (isTimeLimited && clocksToMillis(totalTime) >= timeLimitInMillis) {
+		if (isTimeLimited && totalTimeInSeconds >= timeLimitInSeconds) {
 			timeLimitExceeded = true;
 			break;
 		}
-
-		startTime = clock();
 	}
 	output.close();
 
 	// Output summary to standard output
 	if (timeLimitExceeded) {
-		cout << "Time limit reached" << endl;
+		cout << "Time limit reached, ";
 	} else {
-		cout << "All minimal triangulations were generated!" << endl;
+		cout << "All minimal triangulations were generated! ";
 	}
-	cout << resultNumber-1 << " results found. ";
-	cout << "Total time " << clocksToMillis(totalTime) << " milliseconds." << endl;
+	cout << resultNumber-1 << " results found, ";
+	cout << "Total time " << totalTimeInSeconds << " seconds." << endl;
 	cout << "First result: ";
 	results[0].printDetails();
 	cout << "Lowest fill: ";
 	minFill.printDetails();
-	cout << "Lowest tree-width: ";
+	cout << "Lowest width: ";
 	minWidth.printDetails();
 
 	return 0;
