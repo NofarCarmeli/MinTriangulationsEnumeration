@@ -100,6 +100,23 @@ int ChordalGraph::getTreeWidth() const {
 	return maxSize - 1;
 }
 
+set< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
+	set< set<Node> > edges;
+	NodeSet nodes = getNodes();
+	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
+		NodeSet neighbors = getNeighbors(*i);
+		for (NodeSetIterator j=neighbors.begin(); j!=neighbors.end(); ++j) {
+			if (*i <= *j && origin.getNeighbors(*i).count(*j) == 0) {
+				set<Node> edge;
+				edge.insert(*i);
+				edge.insert(*j);
+				edges.insert(edge);
+			}
+		}
+	}
+	return edges;
+}
+
 void ChordalGraph::printTriangulation(const Graph& origin) const {
 	NodeSet nodes = getNodes();
 	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {

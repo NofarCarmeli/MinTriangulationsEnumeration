@@ -6,9 +6,10 @@ namespace tdenum {
 /*
  * Initialization
  */
-MinimalTriangulationsEnumerator::MinimalTriangulationsEnumerator(const Graph& g) :
+MinimalTriangulationsEnumerator::MinimalTriangulationsEnumerator(
+			const Graph& g, ScoringCriterion c) :
 		graph(g), separatorGraph(graph), extender(graph, MinimalTriangulator()),
-		scorer(graph, NONE), setsEnumerator(separatorGraph, extender, scorer) {}
+		scorer(graph, c), setsEnumerator(separatorGraph, extender, scorer) {}
 
 /*
  * Checks whether there is another minimal triangulation

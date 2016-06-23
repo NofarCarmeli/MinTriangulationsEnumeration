@@ -44,8 +44,11 @@ public:
 
 /**
  * First parameter is the graph file path. Second is timeout in seconds.
+ * Third is the order of extending triangulations. Options are: width, fill,
+ * difference, sepsize, none.
  */
 int main(int argc, char* argv[]) {
+	// Parse input
 	if (argc < 2) {
 		cout << "No graph file specified" << endl;
 		return 0;
@@ -53,8 +56,25 @@ int main(int argc, char* argv[]) {
 	bool isTimeLimited = false;
 	int timeLimitInSeconds = -1;
 	if (argc >= 3) {
-		isTimeLimited = true;
 		timeLimitInSeconds = atoi(argv[2]);
+		if (timeLimitInSeconds >= 0) {
+			isTimeLimited = true;
+		}
+	}
+	ScoringCriterion criterion = NONE;
+	if (argc >=4) {
+		string criterionName = argv[3];
+		if (criterionName == "fill") {
+			criterion = FILL;
+		} else if (criterionName == "width") {
+			criterion = WIDTH;
+		} else if (criterionName == "difference") {
+			criterion = DIFFERENECE;
+		} else if (criterionName == "sepsize") {
+			criterion = MAX_SEP_SIZE;
+		} else if (criterionName == "none") {
+			criterion = NONE;
+		}
 	}
 
 	// Manage files
@@ -80,7 +100,7 @@ int main(int argc, char* argv[]) {
 	startTime = clock();
 
 	// generate and print the results to output file
-	MinimalTriangulationsEnumerator enumerator(g);
+	MinimalTriangulationsEnumerator enumerator(g, criterion);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
 
