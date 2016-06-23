@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 		cout << "Reading the graph took " << double(clock() - startTime) / CLOCKS_PER_SEC
 				<< " seconds" << endl;
 	}
-	cout << "Starting enumeration" << endl;
+	cout << "Starting enumeration for "  << inputFileName << endl;
 
 	// initialize variables
 	int resultNumber = 1;

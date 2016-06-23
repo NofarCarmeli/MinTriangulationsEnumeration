@@ -3,6 +3,7 @@
 
 #include "SuccinctGraphRepresentation.h"
 #include "IndependentSetExtender.h"
+#include "IndependentSetScorer.h"
 
 namespace tdenum {
 
@@ -16,9 +17,10 @@ template<class T>
 class MaximalIndependentSetsEnumerator {
 	SuccinctGraphRepresentation<T>& graph;
 	IndependentSetExtender<T>& extender;
+	IndependentSetScorer<T>& scorer;
 	set<T> nodesGenerated;
-	set< set<T> > maxIndependentSetsReturned;
-	set< set<T> > maxIndependentSetsNotReturned;
+	set< pair<int, set<T> > > maxIndependentSetsReturned;
+	set< pair<int, set<T> > > maxIndependentSetsNotReturned;
 
 	set<T> extendSetInDirectionOfNode(const set<T>& set, const T& node);
 	void maxIndependentSetFound(const set<T>& set);
@@ -28,7 +30,7 @@ public:
 	 * independent set expansion.
 	 */
 	MaximalIndependentSetsEnumerator(SuccinctGraphRepresentation<T>& graph,
-			IndependentSetExtender<T>& extender);
+			IndependentSetExtender<T>& extender, IndependentSetScorer<T>& scorer);
 	/**
 	 * Checks whether there is another maximal independent set.
 	 */
@@ -48,10 +50,12 @@ public:
  */
 template<class T>
 MaximalIndependentSetsEnumerator<T>::MaximalIndependentSetsEnumerator(
-		SuccinctGraphRepresentation<T>& g,
-		IndependentSetExtender<T>& e) : graph(g), extender(e){
+		SuccinctGraphRepresentation<T>& g, IndependentSetExtender<T>& e,
+		IndependentSetScorer<T>& s) : graph(g), extender(e), scorer (s) {
 	set<T> firstIndSet = extender.extendToMaxIndependentSet(set<T>());
-	maxIndependentSetsNotReturned.insert(firstIndSet);
+	pair<int, set<T> > scoredFirstIndSet = make_pair(
+			scorer.scoreIndependentSet(firstIndSet), firstIndSet);
+	maxIndependentSetsNotReturned.insert(scoredFirstIndSet);
 }
 
 /*
@@ -87,8 +91,9 @@ set<T> MaximalIndependentSetsEnumerator<T>::extendSetInDirectionOfNode(
  */
 template<class T>
 void MaximalIndependentSetsEnumerator<T>::maxIndependentSetFound(const set<T>& s) {
-	if (maxIndependentSetsReturned.find(s) == maxIndependentSetsReturned.end()) {
-		maxIndependentSetsNotReturned.insert(s);
+	pair<int, set<T> > scoredIndSet = make_pair(scorer.scoreIndependentSet(s), s);
+	if (maxIndependentSetsReturned.find(scoredIndSet) == maxIndependentSetsReturned.end()) {
+		maxIndependentSetsNotReturned.insert(scoredIndSet);
 	}
 }
 
@@ -103,26 +108,26 @@ set<T> MaximalIndependentSetsEnumerator<T>::next() {
 		return set<T>();
 	}
 	// Choose set to extend
-	set<T> currentSet = *maxIndependentSetsNotReturned.begin();
+	pair<int, set<T> > currentSet = *maxIndependentSetsNotReturned.begin();
 	// Transfer set to the list of returned sets
 	maxIndependentSetsReturned.insert(currentSet);
 	maxIndependentSetsNotReturned.erase(currentSet);
 	// Process set to create new sets
 	for (typename set<T>::iterator i = nodesGenerated.begin(); i!=nodesGenerated.end(); ++i) {
-		set<T> generatedSet = extendSetInDirectionOfNode(currentSet, *i);
+		set<T> generatedSet = extendSetInDirectionOfNode(currentSet.second, *i);
 		maxIndependentSetFound(generatedSet);
 	}
 	while(maxIndependentSetsNotReturned.empty() && graph.hasNextNode()) {
 		// generate a new node and extend returned sets in this direction
 		T generatedNode = graph.nextNode();
 		nodesGenerated.insert(generatedNode);
-		for (typename set< set<T> >::iterator i=maxIndependentSetsReturned.begin();
+		for (typename set< pair < int,set<T> > >::iterator i=maxIndependentSetsReturned.begin();
 				i!=maxIndependentSetsReturned.end(); ++i) {
-			set<T> generatedSet = extendSetInDirectionOfNode(*i, generatedNode);
+			set<T> generatedSet = extendSetInDirectionOfNode(i->second, generatedNode);
 			maxIndependentSetFound(generatedSet);
 		}
 	}
-	return currentSet;
+	return currentSet.second;
 }
 
 } /* namespace tdenum */

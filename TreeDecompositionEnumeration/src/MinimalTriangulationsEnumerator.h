@@ -5,6 +5,7 @@
 #include "SeparatorGraph.h"
 #include "IndSetExtByTriangulation.h"
 #include "MaximalIndependentSetsEnumerator.h"
+#include "IndSetScorerByTriangulation.h"
 
 namespace tdenum {
 
@@ -15,6 +16,7 @@ class MinimalTriangulationsEnumerator {
 	Graph graph;
 	SeparatorGraph separatorGraph;
 	IndSetExtByTriangulation extender;
+	IndSetScorerByTriangulation scorer;
 	MaximalIndependentSetsEnumerator<MinimalSeparator> setsEnumerator;
 public:
 	// initialization
