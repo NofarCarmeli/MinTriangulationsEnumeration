@@ -46,6 +46,8 @@ public:
  * First parameter is the graph file path. Second is timeout in seconds.
  * Third is the order of extending triangulations. Options are: width, fill,
  * difference, sepsize, none.
+ * Fourth is the order of extending minimal separators. Options are: size
+ * (ascending) or none.
  */
 int main(int argc, char* argv[]) {
 	// Parse input
@@ -61,7 +63,7 @@ int main(int argc, char* argv[]) {
 			isTimeLimited = true;
 		}
 	}
-	ScoringCriterion criterion = NONE;
+	TriangulationScoringCriterion criterion = NONE;
 	if (argc >=4) {
 		string criterionName = argv[3];
 		if (criterionName == "fill") {
@@ -74,6 +76,15 @@ int main(int argc, char* argv[]) {
 			criterion = MAX_SEP_SIZE;
 		} else if (criterionName == "none") {
 			criterion = NONE;
+		}
+	}
+	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
+	if (argc >=5) {
+		string criterionName = argv[4];
+		if (criterionName == "size") {
+			separatorsOrder = ASCENDING_SIZE;
+		} else if (criterionName == "none") {
+			separatorsOrder = UNIFORM;
 		}
 	}
 
@@ -100,7 +111,7 @@ int main(int argc, char* argv[]) {
 	startTime = clock();
 
 	// generate and print the results to output file
-	MinimalTriangulationsEnumerator enumerator(g, criterion);
+	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
 

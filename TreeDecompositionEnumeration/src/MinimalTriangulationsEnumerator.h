@@ -20,7 +20,7 @@ class MinimalTriangulationsEnumerator {
 	MaximalIndependentSetsEnumerator<MinimalSeparator> setsEnumerator;
 public:
 	// initialization
-	MinimalTriangulationsEnumerator(const Graph& g, ScoringCriterion c);
+	MinimalTriangulationsEnumerator(const Graph& g, TriangulationScoringCriterion triC, SeparatorsScoringCriterion sepC);
 	// Checks whether there is another minimal triangulation
 	bool hasNext();
 	// Returns another minimal triangulation

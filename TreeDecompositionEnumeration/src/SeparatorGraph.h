@@ -15,7 +15,7 @@ class SeparatorGraph : public SuccinctGraphRepresentation<MinimalSeparator> {
 	MinimalSeparatorsEnumerator nodesEnumerator;
 public:
 	// Initialization
-	SeparatorGraph(const Graph& g);
+	SeparatorGraph(const Graph& g, SeparatorsScoringCriterion c);
 	// Checks whether there is another minimal separator
 	virtual bool hasNextNode();
 	// Returns another minimal separator

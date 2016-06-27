@@ -3,7 +3,8 @@
 
 namespace tdenum {
 
-SeparatorGraph::SeparatorGraph(const Graph& g) : graph(g), nodesEnumerator(g) {}
+SeparatorGraph::SeparatorGraph(const Graph& g, SeparatorsScoringCriterion c) :
+		graph(g), nodesEnumerator(g, c) {}
 
 bool SeparatorGraph::hasNextNode() {
 	return nodesEnumerator.hasNext();

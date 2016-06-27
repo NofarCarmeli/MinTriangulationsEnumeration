@@ -5,6 +5,8 @@
 
 namespace tdenum {
 
+enum SeparatorsScoringCriterion { UNIFORM, ASCENDING_SIZE };
+
 /**
  * Enumerates the minimal separators of a graph with polynomial delay.
  *
@@ -14,12 +16,13 @@ namespace tdenum {
  */
 class MinimalSeparatorsEnumerator {
 	Graph graph;
-	set<MinimalSeparator> separatorsReturned;
-	set<MinimalSeparator> separatorsNotReturned;
+	SeparatorsScoringCriterion order;
+	set< pair<int,MinimalSeparator> > separatorsReturned;
+	set< pair<int,MinimalSeparator> > separatorsNotReturned;
 	void minimalSeparatorFound(const MinimalSeparator& s);
 public:
 	// Initialization
-	MinimalSeparatorsEnumerator(const Graph& g);
+	MinimalSeparatorsEnumerator(const Graph& g, SeparatorsScoringCriterion c);
 	// Checks whether there is another minimal separator
 	bool hasNext();
 	// Returns another minimal separator

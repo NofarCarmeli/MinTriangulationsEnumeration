@@ -5,9 +5,8 @@ namespace tdenum {
 /*
  * Initialization
  */
-MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g) {
-	// Save the graph
-	graph = g;
+MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g, SeparatorsScoringCriterion c) :
+	graph(g), order(c) {
 	// Initialize separatorsNotReturned according to the initialization phase
 	NodeSet nodes = graph.getNodes();
 	for (NodeSetIterator i = nodes.begin(); i != nodes.end(); ++i) {
@@ -19,7 +18,9 @@ MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g) {
 				++it) {
 			NodeSet potentialSeparator = graph.getNeighbors(*it);
 			if (potentialSeparator.size() > 0) {
-				separatorsNotReturned.insert(potentialSeparator);
+				int score = order==ASCENDING_SIZE ? potentialSeparator.size() : 0;
+				pair<int,MinimalSeparator> scoredSeparator = make_pair(score, potentialSeparator);
+				separatorsNotReturned.insert(scoredSeparator);
 			}
 		}
 	}
@@ -38,8 +39,10 @@ bool MinimalSeparatorsEnumerator::hasNext() {
  * returned separators.
  */
 void MinimalSeparatorsEnumerator::minimalSeparatorFound(const MinimalSeparator& s) {
-	if (s.size() > 0 && separatorsReturned.find(s) == separatorsReturned.end()) {
-		separatorsNotReturned.insert(s);
+	int score = order==ASCENDING_SIZE ? s.size() : 0;
+	pair<int,MinimalSeparator> scoredSeparator = make_pair(score, s);
+	if (s.size() > 0 && separatorsReturned.find(scoredSeparator) == separatorsReturned.end()) {
+		separatorsNotReturned.insert(scoredSeparator);
 	}
 }
 
@@ -53,7 +56,8 @@ MinimalSeparator MinimalSeparatorsEnumerator::next() {
 		return MinimalSeparator();
 	}
 	// Choose separator
-	MinimalSeparator s = *separatorsNotReturned.begin();
+	pair<int,MinimalSeparator> scoredSeparator = *separatorsNotReturned.begin();
+	MinimalSeparator s = scoredSeparator.second;
 	// Process separator according to the generation phase
 	for (NodeSetIterator i = s.begin(); i != s.end(); ++i) {
 		Node x = *i;
@@ -68,9 +72,8 @@ MinimalSeparator MinimalSeparatorsEnumerator::next() {
 		}
 	}
 	// Transfer separator to the list of returned separators
-	separatorsReturned.insert(s);
-	separatorsNotReturned.erase(s);
-	//printNodeSet(s); //TODO remove
+	separatorsReturned.insert(scoredSeparator);
+	separatorsNotReturned.erase(scoredSeparator);
 	return s;
 }
 
