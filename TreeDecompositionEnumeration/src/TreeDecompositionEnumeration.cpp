@@ -55,6 +55,8 @@ int main(int argc, char* argv[]) {
 		cout << "No graph file specified" << endl;
 		return 0;
 	}
+	string inputFileName = argv[1];
+	string outputFileName = inputFileName + ".output";
 	bool isTimeLimited = false;
 	int timeLimitInSeconds = -1;
 	if (argc >= 3) {
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
 	TriangulationScoringCriterion criterion = NONE;
 	if (argc >=4) {
 		string criterionName = argv[3];
+		outputFileName = outputFileName + "." + criterionName;
 		if (criterionName == "fill") {
 			criterion = FILL;
 		} else if (criterionName == "width") {
@@ -81,18 +84,18 @@ int main(int argc, char* argv[]) {
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
 	if (argc >=5) {
 		string criterionName = argv[4];
+		outputFileName = outputFileName + "." + criterionName;
 		if (criterionName == "size") {
 			separatorsOrder = ASCENDING_SIZE;
 		} else if (criterionName == "none") {
 			separatorsOrder = UNIFORM;
 		}
 	}
+	outputFileName = outputFileName + ".csv";
 
 	// Manage files
 	clock_t startTime = clock();
-	string inputFileName = argv[1];
 	Graph g = GraphReader::read(inputFileName);
-	string outputFileName = inputFileName + ".output.csv";
 	ofstream output;
 	output.open(outputFileName.c_str());
 	cout << setprecision(2);
