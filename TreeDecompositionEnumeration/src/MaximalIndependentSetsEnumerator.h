@@ -39,6 +39,13 @@ public:
 	 * Returns another maximal independent set.
 	 */
 	set<T> next();
+
+	/**
+	 * Returns all the results that were generated as part of the calculations
+	 * but not returned yet. Useful in case of partial enumeration when you
+	 * don't want to invest more time in generating more results.
+	 */
+	vector< set<T> > getGeneratedNotReturned();
 };
 
 
@@ -128,6 +135,21 @@ set<T> MaximalIndependentSetsEnumerator<T>::next() {
 		}
 	}
 	return currentSet.second;
+}
+
+/**
+ * Returns all the results that were generated as part of the calculations
+ * but not returned yet. Useful in case of partial enumeration when you
+ * don't want to invest more time in generating more results.
+ */
+template<class T>
+vector< set<T> > MaximalIndependentSetsEnumerator<T>::getGeneratedNotReturned(){
+	vector< set<T> > result;
+	for (typename set< pair<int, set<T> > >::iterator it=maxIndependentSetsNotReturned.begin();
+			it!=maxIndependentSetsNotReturned.end(); ++it) {
+		result.push_back(it->second);
+	}
+	return result;
 }
 
 } /* namespace tdenum */

@@ -42,6 +42,27 @@ public:
 	}
 };
 
+void processResult(double totalTimeInSeconds, const Graph& g, int& resultNumber,
+		Result& minWidth, Result& minFill, vector<Result>& results,
+		ofstream& output, const ChordalGraph& triangulation) {
+	Result res(resultNumber, totalTimeInSeconds, g, triangulation);
+	results.push_back(res);
+	if (resultNumber == 1) {
+		minWidth = res;
+		minFill = res;
+		Result::printCsvHeader(output);
+	} else {
+		if (res.getWidth() < minWidth.getWidth()) {
+			minWidth = res;
+		}
+		if (res.getFill() < minFill.getFill()) {
+			minFill = res;
+		}
+	}
+	res.printCsv(output);
+	resultNumber++;
+}
+
 /**
  * First parameter is the graph file path. Second is timeout in seconds.
  * Third is the order of extending triangulations. Options are: width, fill,
@@ -119,27 +140,14 @@ int main(int argc, char* argv[]) {
 	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
-
 		totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
-		Result res(resultNumber, totalTimeInSeconds, g, triangulation);
-		results.push_back(res);
-		if (resultNumber == 1) {
-			minWidth = res;
-			minFill = res;
-			Result::printCsvHeader(output);
-		} else {
-			if (res.getWidth() < minWidth.getWidth()) {
-				minWidth = res;
-			}
-			if (res.getFill() < minFill.getFill()) {
-				minFill = res;
-			}
-		}
-		res.printCsv(output);
-		resultNumber++;
-
+		processResult(totalTimeInSeconds, g, resultNumber, minWidth, minFill, results, output, triangulation);
 		if (isTimeLimited && totalTimeInSeconds >= timeLimitInSeconds) {
 			timeLimitExceeded = true;
+			vector<ChordalGraph> moreResults = enumerator.getGeneratedNotReturned();
+			for (unsigned int i=0; i<moreResults.size(); i++) {
+				processResult(startTime, g, resultNumber, minWidth, minFill, results, output, moreResults[i]);
+			}
 			break;
 		}
 	}
