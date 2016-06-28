@@ -47,7 +47,7 @@ public:
  * Third is the order of extending triangulations. Options are: width, fill,
  * difference, sepsize, none.
  * Fourth is the order of extending minimal separators. Options are: size
- * (ascending) or none.
+ * (ascending), fill or none.
  */
 int main(int argc, char* argv[]) {
 	// Parse input
@@ -89,6 +89,8 @@ int main(int argc, char* argv[]) {
 			separatorsOrder = ASCENDING_SIZE;
 		} else if (criterionName == "none") {
 			separatorsOrder = UNIFORM;
+		} else if (criterionName == "fill") {
+			separatorsOrder = FILL_EDGES;
 		}
 	}
 	outputFileName = outputFileName + ".csv";

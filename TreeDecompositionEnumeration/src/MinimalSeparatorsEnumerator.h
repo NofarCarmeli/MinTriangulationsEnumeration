@@ -2,10 +2,9 @@
 #define MINIMALSEPARATORSENUMERATOR_H_
 
 #include "Graph.h"
+#include "SeparatorsScorer.h"
 
 namespace tdenum {
-
-enum SeparatorsScoringCriterion { UNIFORM, ASCENDING_SIZE };
 
 /**
  * Enumerates the minimal separators of a graph with polynomial delay.
@@ -16,7 +15,7 @@ enum SeparatorsScoringCriterion { UNIFORM, ASCENDING_SIZE };
  */
 class MinimalSeparatorsEnumerator {
 	Graph graph;
-	SeparatorsScoringCriterion order;
+	SeparatorsScorer scorer;
 	set< pair<int,MinimalSeparator> > separatorsReturned;
 	set< pair<int,MinimalSeparator> > separatorsNotReturned;
 	void minimalSeparatorFound(const MinimalSeparator& s);

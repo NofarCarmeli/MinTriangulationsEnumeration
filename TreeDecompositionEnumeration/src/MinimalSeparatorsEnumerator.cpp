@@ -6,7 +6,7 @@ namespace tdenum {
  * Initialization
  */
 MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g, SeparatorsScoringCriterion c) :
-	graph(g), order(c) {
+	graph(g), scorer(g,c) {
 	// Initialize separatorsNotReturned according to the initialization phase
 	NodeSet nodes = graph.getNodes();
 	for (NodeSetIterator i = nodes.begin(); i != nodes.end(); ++i) {
@@ -18,7 +18,7 @@ MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g, Separat
 				++it) {
 			NodeSet potentialSeparator = graph.getNeighbors(*it);
 			if (potentialSeparator.size() > 0) {
-				int score = order==ASCENDING_SIZE ? potentialSeparator.size() : 0;
+				int score = scorer.scoreSeparator(potentialSeparator);
 				pair<int,MinimalSeparator> scoredSeparator = make_pair(score, potentialSeparator);
 				separatorsNotReturned.insert(scoredSeparator);
 			}
@@ -39,7 +39,7 @@ bool MinimalSeparatorsEnumerator::hasNext() {
  * returned separators.
  */
 void MinimalSeparatorsEnumerator::minimalSeparatorFound(const MinimalSeparator& s) {
-	int score = order==ASCENDING_SIZE ? s.size() : 0;
+	int score = scorer.scoreSeparator(s);
 	pair<int,MinimalSeparator> scoredSeparator = make_pair(score, s);
 	if (s.size() > 0 && separatorsReturned.find(scoredSeparator) == separatorsReturned.end()) {
 		separatorsNotReturned.insert(scoredSeparator);
