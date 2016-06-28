@@ -4,7 +4,7 @@ Implements enumeration of all minimal triangulations of a graph as described in 
 
 ## Input
 
-Specify input file and configuration using commant line arguments:
+Specify input file and configuration using command line arguments:
 ```
 ./TreeDecompositionEnumeration <input_file> <time_limit> <triangulations_order> <separators_order>
 ```
@@ -16,7 +16,8 @@ Supported file formats are: hg, sp, wcnf, uai, csv.
 * csv - each line holds name of variables in a clique.
 
 ### time_limit
-Time in seconds after which no more results are extended. The current one will finish extending, and all results that where found but not extended yet will be printed too.
+Time in seconds after which no more results are extended. The current one will finish extending, and all results that where found but not extended yet will be printed as well.
+-1 means no time limit.
 
 ### triangulations_order
 The order of extending the generated minimal triangulations.
