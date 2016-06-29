@@ -3,6 +3,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
+#include <string>
 #include "GraphReader.h"
 #include "MinimalTriangulationsEnumerator.h"
 using namespace std;
