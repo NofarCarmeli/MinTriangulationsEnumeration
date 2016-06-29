@@ -18,6 +18,7 @@ Supported file formats are: hg, sp, wcnf, uai, csv.
 ### time_limit
 Time in seconds after which no more results are extended. The current one will finish extending, and all results that where found but not extended yet will be printed as well.
 -1 means no time limit.
+Default is no time limit.
 
 ### triangulations_order
 The order of extending the generated minimal triangulations.
@@ -36,3 +37,4 @@ Options are: size, fill, none. Default is none.
 ## Output
 
 The full list of triangulations is saved to a file next to the input file, while a summary is printed to the screen.
+The output file is \<input_file\>.output.\<triangulations_order\>.\<separators_order\>.csv (or \<input-name\>.output.csv if no order heuristics are specified).
