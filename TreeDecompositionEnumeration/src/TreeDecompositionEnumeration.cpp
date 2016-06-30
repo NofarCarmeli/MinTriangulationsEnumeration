@@ -6,7 +6,6 @@
 #include <string>
 #include "GraphReader.h"
 #include "MinimalTriangulationsEnumerator.h"
-#include "Tests.h"
 using namespace std;
 using namespace tdenum;
 
