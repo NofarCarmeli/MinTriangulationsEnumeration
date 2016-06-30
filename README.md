@@ -6,10 +6,9 @@ Implements enumeration of all minimal triangulations of a graph as described in 
 
 Specify input file and configuration using command line arguments:
 ```
-./TreeDecompositionEnumeration <input_file> <time_limit> <triangulations_order> <separators_order>
+./TreeDecompositionEnumeration <input_file> <time_limit> <triangulation_heuristic> <triangulations_order> <separators_order>
 ```
 Only the input file is required.
-Currently the heuristic used for generating a minimal triangulation is MSC-M.
 
 ### input_file
 Supported file formats are: hg, sp, wcnf, uai, csv.
@@ -19,6 +18,13 @@ Supported file formats are: hg, sp, wcnf, uai, csv.
 Time in seconds after which no more results are extended. The current one will finish extending, and all results that where found but not extended yet will be printed as well.
 -1 means no time limit.
 Default is no time limit.
+
+### triangualtion_heuristic
+The heuristic used for generating a single minimal triangulation.
+Options are: msc, degree, fill. Default is msc.
+* msc - using MSC-M algorithm.
+* degree - using LB-Triang algorithm with min-degree heuristic for the order of vertices.
+* fill - using LB-Triang algorithm with min-fill heuristic for the order of vertices.
 
 ### triangulations_order
 The order of extending the generated minimal triangulations.
@@ -37,4 +43,4 @@ Options are: size, fill, none. Default is none.
 ## Output
 
 The full list of triangulations is saved to a file next to the input file, while a summary is printed to the screen.
-The output file is \<input_file\>.output.\<triangulations_order\>.\<separators_order\>.csv (or \<input-name\>.output.csv if no order heuristics are specified).
+The output file is `<input_file>.output.<triangulation_heuristic>.<triangulations_order>.<separators_order>.csv` (or `<input-name>.output.csv` if no heuristics are specified).
