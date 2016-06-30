@@ -5,12 +5,16 @@
 
 namespace tdenum {
 
+enum TriangulationAlgorithm { MSC_M, MIN_FILL_LB_TRIANG, MIN_DEGREE_LB_TRIANG };
+
 /**
  * Calculates a minimal triangulation of the graph
+ * Implements MSC-M or LB-Triang with min-fill or min-dgree heuristics
  */
 class MinimalTriangulator {
+	TriangulationAlgorithm heuristic;
 public:
-	MinimalTriangulator();
+	MinimalTriangulator(TriangulationAlgorithm h);
 	ChordalGraph triangulate(const Graph& g);
 };
 

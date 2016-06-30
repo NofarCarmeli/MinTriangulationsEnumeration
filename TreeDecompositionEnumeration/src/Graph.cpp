@@ -62,6 +62,13 @@ int Graph::getNumberOfEdges() const {
 }
 
 /*
+ * Returns the number of nodes in the graph
+ */
+int Graph::getNumberOfNodes() const {
+	return numberOfNodes;
+}
+
+/*
  * Returns the set of neighbors of the given node
  */
 NodeSet Graph::getNeighbors(Node v) const {

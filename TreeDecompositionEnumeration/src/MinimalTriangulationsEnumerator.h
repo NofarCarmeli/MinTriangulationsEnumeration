@@ -15,12 +15,14 @@ namespace tdenum {
 class MinimalTriangulationsEnumerator {
 	Graph graph;
 	SeparatorGraph separatorGraph;
+	MinimalTriangulator triangulator;
 	IndSetExtByTriangulation extender;
 	IndSetScorerByTriangulation scorer;
 	MaximalIndependentSetsEnumerator<MinimalSeparator> setsEnumerator;
 public:
 	// initialization
-	MinimalTriangulationsEnumerator(const Graph& g, TriangulationScoringCriterion triC, SeparatorsScoringCriterion sepC);
+	MinimalTriangulationsEnumerator(const Graph& g, TriangulationScoringCriterion triC,
+			SeparatorsScoringCriterion sepC, TriangulationAlgorithm heuristic);
 	// Checks whether there is another minimal triangulation
 	bool hasNext();
 	// Returns another minimal triangulation

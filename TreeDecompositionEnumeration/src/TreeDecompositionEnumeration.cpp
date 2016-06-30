@@ -6,6 +6,7 @@
 #include <string>
 #include "GraphReader.h"
 #include "MinimalTriangulationsEnumerator.h"
+#include "Tests.h"
 using namespace std;
 using namespace tdenum;
 
@@ -87,9 +88,21 @@ int main(int argc, char* argv[]) {
 			isTimeLimited = true;
 		}
 	}
-	TriangulationScoringCriterion criterion = NONE;
+	TriangulationAlgorithm heuristic = MSC_M;
 	if (argc >=4) {
-		string criterionName = argv[3];
+		string heuristicName = argv[3];
+		outputFileName = outputFileName + "." + heuristicName;
+		if (heuristicName == "msc") {
+			heuristic = MSC_M;
+		} else if (heuristicName == "degree") {
+			heuristic = MIN_DEGREE_LB_TRIANG;
+		} else if (heuristicName == "fill") {
+			heuristic = MIN_FILL_LB_TRIANG;
+		}
+	}
+	TriangulationScoringCriterion criterion = NONE;
+	if (argc >=5) {
+		string criterionName = argv[4];
 		outputFileName = outputFileName + "." + criterionName;
 		if (criterionName == "fill") {
 			criterion = FILL;
@@ -104,8 +117,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
-	if (argc >=5) {
-		string criterionName = argv[4];
+	if (argc >=6) {
+		string criterionName = argv[5];
 		outputFileName = outputFileName + "." + criterionName;
 		if (criterionName == "size") {
 			separatorsOrder = ASCENDING_SIZE;
@@ -138,7 +151,7 @@ int main(int argc, char* argv[]) {
 	startTime = clock();
 
 	// generate and print the results to output file
-	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder);
+	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder, heuristic);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
 		totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
