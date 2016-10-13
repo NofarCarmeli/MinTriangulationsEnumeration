@@ -12,48 +12,60 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 	ChordalGraph triangulation(g); // holds the result
 	map<Node, int> weight; // default is zero
 	set< pair<int,Node> > mcsQueue;
-	NodeSet visited;
-	NodeSet unvisited = g.getNodes();
-	for (NodeSetIterator i=unvisited.begin(); i!=unvisited.end(); ++i) {
-		mcsQueue.insert(pair<int,Node> (0,*i));
+	vector<bool> handled (g.getNumberOfNodes(), false);
+	for (Node v = 0; v<g.getNumberOfNodes(); v++) {
+		mcsQueue.insert(pair<int,Node> (0,v));
 	}
 	// start search
 	while (!mcsQueue.empty()) {
 		// Pop node from queue
 		pair<int,Node> current = *mcsQueue.rbegin();
-		Node z = current.second;
+		Node v = current.second;
 		mcsQueue.erase(current);
-		for (NodeSetIterator i=unvisited.begin(); i!=unvisited.end(); ++i) {
-			Node y = *i;
-			NodeSet consideredForPath;
-			multiset<Node> weightUpdated;
-			for (NodeSetIterator j=unvisited.begin(); j!=unvisited.end(); ++j) {
-				if (weight[*j] < weight[*i]) {
-					consideredForPath.insert(*j);
-				}
-			}
-			consideredForPath.insert(y);
-			consideredForPath.insert(z);
-			set<NodeSet> components = g.getComponentsOfSubgraph(consideredForPath, NodeSet());
-			for (set<NodeSet>::iterator comp=components.begin(); comp!=components.end(); ++comp) {
-				if ((*comp).count(y)+(*comp).count(z)==2) {
-					weightUpdated.insert(y);
-					NodeSet s;
-					s.insert(y);
-					s.insert(z);
-					triangulation.addClique(s);
-					break;
-				}
-			}
-			for (multiset<Node>::iterator j=weightUpdated.begin(); j!=weightUpdated.end(); ++j) {
-				Node y = *j;
-				mcsQueue.erase(pair<int,Node> (weight[y],y));
-				weight[y]++;
-				mcsQueue.insert(pair<int,Node> (weight[y],y));
+		handled[v] = true;
+		// Find nodes to update
+		multiset<Node> nodesToUpdate;
+		vector<bool> reached(g.getNumberOfNodes(), false);
+		vector< vector<Node> > reachedByMaxWeight(g.getNumberOfNodes(), vector<Node>());
+		NodeSet neighborsOfV = g.getNeighbors(v);
+		for (NodeSetIterator i=neighborsOfV.begin(); i!=neighborsOfV.end(); ++i) {
+			Node u = *i;
+			if (!handled[u]) {
+				nodesToUpdate.insert(u);
+				reached[u] = true;
+				reachedByMaxWeight[weight[u]].push_back(u);
 			}
 		}
-		unvisited.erase(z);
-		visited.insert(z);
+		for (int maxWeight=0; maxWeight<g.getNumberOfNodes(); maxWeight++) {
+			while (!reachedByMaxWeight[maxWeight].empty()) {
+				Node w = reachedByMaxWeight[maxWeight].back();
+				reachedByMaxWeight[maxWeight].pop_back();
+				NodeSet neighborsOfW = g.getNeighbors(w);
+				for (NodeSetIterator i=neighborsOfW.begin(); i!=neighborsOfW.end(); ++i) {
+					Node u = *i;
+					if (!handled[u] && !reached[u]) {
+						if (weight[u] > maxWeight) {
+							nodesToUpdate.insert(u);
+						}
+						reached[u] = true;
+						reachedByMaxWeight[max(weight[u], maxWeight)].push_back(u);
+					}
+				}
+			}
+		}
+		// Update nodes
+		for (multiset<Node>::iterator j=nodesToUpdate.begin(); j!=nodesToUpdate.end(); ++j) {
+			Node u = *j;
+			// Update weight
+			mcsQueue.erase(pair<int,Node> (weight[u],u));
+			weight[u]++;
+			mcsQueue.insert(pair<int,Node> (weight[u],u));
+			// Add edge
+			NodeSet s;
+			s.insert(u);
+			s.insert(v);
+			triangulation.addClique(s);
+		}
 	}
 	return triangulation;
 }
