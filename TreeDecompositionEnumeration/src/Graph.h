@@ -26,6 +26,8 @@ public:
 	Graph();
 	// Constructs a graph with nodes and without edges
 	Graph(int numberOfNodes);
+	// Connects the given two nodes by a edge
+	void addEdge(Node u, Node v);
 	// Adds edges that will make that given node set a clique
 	void addClique(const NodeSet& s);
 	// Adds edges that will make the given node sets cliques

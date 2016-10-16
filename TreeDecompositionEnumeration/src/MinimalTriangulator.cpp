@@ -4,36 +4,58 @@
 
 namespace tdenum {
 
+class IncreasingWeightNodeQueue {
+	vector<int> weight;
+	set< pair<int,Node> > queue;
+public:
+	IncreasingWeightNodeQueue(int numberOfNodes) : weight(numberOfNodes, 0) {
+		for (Node v = 0; v<numberOfNodes; v++) {
+			queue.insert(pair<int,Node> (0,v));
+		}
+	}
+	void increaseWeight(Node v) {
+		queue.erase(pair<int,Node> (weight[v],v));
+		weight[v]++;
+		queue.insert(pair<int,Node> (weight[v],v));
+	}
+	int getWeight(Node v) {
+		return weight[v];
+	}
+	bool isEmpty() {
+		return queue.empty();
+	}
+	Node pop() {
+		pair<int,Node> current = *queue.rbegin();
+		Node v = current.second;
+		queue.erase(current);
+		return v;
+	}
+};
+
 MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h) {}
 
 // implementing MSC-M algorithm
 ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 	// initialize structures
 	ChordalGraph triangulation(g); // holds the result
-	map<Node, int> weight; // default is zero
-	set< pair<int,Node> > mcsQueue;
+	IncreasingWeightNodeQueue queue(g.getNumberOfNodes());
 	vector<bool> handled (g.getNumberOfNodes(), false);
-	for (Node v = 0; v<g.getNumberOfNodes(); v++) {
-		mcsQueue.insert(pair<int,Node> (0,v));
-	}
 	// start search
-	while (!mcsQueue.empty()) {
+	while (!queue.isEmpty()) {
 		// Pop node from queue
-		pair<int,Node> current = *mcsQueue.rbegin();
-		Node v = current.second;
-		mcsQueue.erase(current);
+		Node v = queue.pop();
 		handled[v] = true;
 		// Find nodes to update
-		multiset<Node> nodesToUpdate;
+		vector<Node> nodesToUpdate;
 		vector<bool> reached(g.getNumberOfNodes(), false);
 		vector< vector<Node> > reachedByMaxWeight(g.getNumberOfNodes(), vector<Node>());
 		NodeSet neighborsOfV = g.getNeighbors(v);
 		for (NodeSetIterator i=neighborsOfV.begin(); i!=neighborsOfV.end(); ++i) {
 			Node u = *i;
 			if (!handled[u]) {
-				nodesToUpdate.insert(u);
+				nodesToUpdate.push_back(u);
 				reached[u] = true;
-				reachedByMaxWeight[weight[u]].push_back(u);
+				reachedByMaxWeight[queue.getWeight(u)].push_back(u);
 			}
 		}
 		for (int maxWeight=0; maxWeight<g.getNumberOfNodes(); maxWeight++) {
@@ -44,27 +66,20 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 				for (NodeSetIterator i=neighborsOfW.begin(); i!=neighborsOfW.end(); ++i) {
 					Node u = *i;
 					if (!handled[u] && !reached[u]) {
-						if (weight[u] > maxWeight) {
-							nodesToUpdate.insert(u);
+						if (queue.getWeight(u) > maxWeight) {
+							nodesToUpdate.push_back(u);
 						}
 						reached[u] = true;
-						reachedByMaxWeight[max(weight[u], maxWeight)].push_back(u);
+						reachedByMaxWeight[max(queue.getWeight(u), maxWeight)].push_back(u);
 					}
 				}
 			}
 		}
 		// Update nodes
-		for (multiset<Node>::iterator j=nodesToUpdate.begin(); j!=nodesToUpdate.end(); ++j) {
+		for (vector<Node>::iterator j=nodesToUpdate.begin(); j!=nodesToUpdate.end(); ++j) {
 			Node u = *j;
-			// Update weight
-			mcsQueue.erase(pair<int,Node> (weight[u],u));
-			weight[u]++;
-			mcsQueue.insert(pair<int,Node> (weight[u],u));
-			// Add edge
-			NodeSet s;
-			s.insert(u);
-			s.insert(v);
-			triangulation.addClique(s);
+			queue.increaseWeight(u);
+			triangulation.addEdge(u, v);
 		}
 	}
 	return triangulation;

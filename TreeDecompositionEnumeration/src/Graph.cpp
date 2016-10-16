@@ -14,18 +14,20 @@ void Graph::addClique(const NodeSet& newClique) {
 		Node v = *i;
 		for (NodeSetIterator j = newClique.begin(); j != newClique.end(); ++j) {
 			Node u = *j;
-			if (!isValidNode(u) || !isValidNode(v)) {
-				return;
-			}
 			if (u < v) {
-				if (neighborSets[u].count(v) == 0) {
-					neighborSets[u].insert(v);
-					neighborSets[v].insert(u);
-					numberOfEdges++;
-				}
+				addEdge(u, v);
 			}
 		}
 	}
+}
+
+void Graph::addEdge(Node u, Node v) {
+	if (!isValidNode(u) || !isValidNode(v) || neighborSets[u].count(v)>0) {
+		return;
+	}
+	neighborSets[u].insert(v);
+	neighborSets[v].insert(u);
+	numberOfEdges++;
 }
 
 void Graph::saturateNodeSets(const set<NodeSet>& s) {
