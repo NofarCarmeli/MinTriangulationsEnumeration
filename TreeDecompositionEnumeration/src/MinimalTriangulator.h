@@ -5,7 +5,7 @@
 
 namespace tdenum {
 
-enum TriangulationAlgorithm { MSC_M, MIN_FILL_LB_TRIANG, MIN_DEGREE_LB_TRIANG };
+enum TriangulationAlgorithm { MCS_M, MIN_FILL_LB_TRIANG, MIN_DEGREE_LB_TRIANG, LB_TRIANG };
 
 /**
  * Calculates a minimal triangulation of the graph

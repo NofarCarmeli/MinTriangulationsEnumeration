@@ -87,16 +87,18 @@ int main(int argc, char* argv[]) {
 			isTimeLimited = true;
 		}
 	}
-	TriangulationAlgorithm heuristic = MSC_M;
+	TriangulationAlgorithm heuristic = MCS_M;
 	if (argc >=4) {
 		string heuristicName = argv[3];
 		outputFileName = outputFileName + "." + heuristicName;
-		if (heuristicName == "msc") {
-			heuristic = MSC_M;
+		if (heuristicName == "mcs") {
+			heuristic = MCS_M;
 		} else if (heuristicName == "degree") {
 			heuristic = MIN_DEGREE_LB_TRIANG;
 		} else if (heuristicName == "fill") {
 			heuristic = MIN_FILL_LB_TRIANG;
+		} else if (heuristicName == "lb") {
+			heuristic = LB_TRIANG;
 		}
 	}
 	TriangulationScoringCriterion criterion = NONE;
@@ -159,7 +161,7 @@ int main(int argc, char* argv[]) {
 			timeLimitExceeded = true;
 			vector<ChordalGraph> moreResults = enumerator.getGeneratedNotReturned();
 			for (unsigned int i=0; i<moreResults.size(); i++) {
-				processResult(startTime, g, resultNumber, minWidth, minFill, results, output, moreResults[i]);
+				processResult(totalTimeInSeconds, g, resultNumber, minWidth, minFill, results, output, moreResults[i]);
 			}
 			break;
 		}

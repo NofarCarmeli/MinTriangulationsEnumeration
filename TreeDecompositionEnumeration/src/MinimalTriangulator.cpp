@@ -4,6 +4,8 @@
 
 namespace tdenum {
 
+MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h) {}
+
 class IncreasingWeightNodeQueue {
 	vector<int> weight;
 	set< pair<int,Node> > queue;
@@ -31,8 +33,6 @@ public:
 		return v;
 	}
 };
-
-MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h) {}
 
 // implementing MSC-M algorithm
 ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
@@ -151,23 +151,29 @@ void makeNodeLBSimplicial(Graph& g, Node v) {
 //FIXME can be done faster (don't compute the score from scratch each time)
 ChordalGraph getMinimalTriangulationUsingLBTriang(const Graph& g, TriangulationAlgorithm heuristic) {
 	Graph result(g);
-	set<Node> unhandledNodes = g.getNodes();
-	for (int i=0; i<g.getNumberOfNodes(); i++) {
-		Node v = i;
-		if (heuristic == MIN_DEGREE_LB_TRIANG) {
-			v = getMinDegree(result,unhandledNodes);
-		} else if (heuristic ==MIN_FILL_LB_TRIANG) {
-			v = getMinFill(result,unhandledNodes);
+	if (heuristic == LB_TRIANG) {
+		for (int v=0; v<g.getNumberOfNodes(); v++) {
+			makeNodeLBSimplicial(result,v);
 		}
-		makeNodeLBSimplicial(result,v);
-		unhandledNodes.erase(v);
+	} else {
+		set<Node> unhandledNodes = g.getNodes();
+		for (int i=0; i<g.getNumberOfNodes(); i++) {
+			Node v = i;
+			if (heuristic == MIN_DEGREE_LB_TRIANG) {
+				v = getMinDegree(result,unhandledNodes);
+			} else if (heuristic == MIN_FILL_LB_TRIANG) {
+				v = getMinFill(result,unhandledNodes);
+			}
+			makeNodeLBSimplicial(result,v);
+			unhandledNodes.erase(v);
+		}
 	}
 	return result;
 }
 
 
 ChordalGraph MinimalTriangulator::triangulate(const Graph& g) {
-	if (heuristic == MSC_M) {
+	if (heuristic == MCS_M) {
 		return getMinimalTriangulationUsingMSCM(g);
 	}
 	return getMinimalTriangulationUsingLBTriang(g, heuristic);
