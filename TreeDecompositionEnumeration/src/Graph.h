@@ -19,8 +19,7 @@ class Graph {
 	vector<NodeSet> neighborSets;
 
 	bool isValidNode(Node v) const;
-	set<NodeSet> getComponentsAux(vector<int> visitedList, int numberOfUnhandeledNodes) const;
-	vector< set<Node> > getComponentsAuxEfficient(vector<int> visitedList, int numberOfUnhandeledNodes) const;
+	vector< set<Node> > getComponentsAux(vector<int> visitedList, int numberOfUnhandeledNodes) const;
 
 public:
 	// Constructs an empty graph
@@ -45,11 +44,7 @@ public:
 	// Returns the neighbors of the given node set
 	NodeSet getNeighbors(const NodeSet& s) const;
 	// Returns the set of components obtained by removing the given node set
-	vector< set<Node> > getComponentsEfficient(const NodeSet& removedNodes) const;
-	// Returns the components obtained by removing the given node set
-	set<NodeSet> getComponents(const NodeSet& s) const;
-	// Returns the components obtained by removing the given node set from the subgraph
-	set<NodeSet> getComponentsOfSubgraph(const NodeSet& subgraph, const NodeSet& s) const;
+	vector< set<Node> > getComponents(const NodeSet& removedNodes) const;
 	// Prints the graph
 	void print();
 };

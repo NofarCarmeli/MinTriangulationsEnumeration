@@ -11,26 +11,29 @@ bool SeparatorGraph::hasNextNode() {
 }
 
 MinimalSeparator SeparatorGraph::nextNode() {
-	MinimalSeparator res = nodesEnumerator.next();
-	return res;
+	return nodesEnumerator.next();
 }
 
 // check if the nodes of v are in different components of the graph obtained by removing u
 bool SeparatorGraph::hasEdge(const MinimalSeparator& u, const MinimalSeparator& v) {
-	set<NodeSet> components = graph.getComponents(u);
+	vector<bool> inV (graph.getNumberOfNodes(), false);
+	for (NodeSet::iterator it = v.begin(); it!=v.end(); ++it) {
+		inV[*it] = true;
+	}
+	vector<NodeSet> componentsofU = graph.getComponents(u);
 	int componentsContainingV = 0;
-	for (set<NodeSet>::iterator i=components.begin(); i!=components.end(); ++i) {
-		bool thisComponentFound = false;
-		for (MinimalSeparator::iterator j = v.begin(); j!=v.end(); ++j) {
-			if ((*i).count(*j)>0) {
-				thisComponentFound = true;
+	for (vector<NodeSet>::iterator i=componentsofU.begin(); i!=componentsofU.end(); ++i) {
+		for (NodeSet::iterator j = i->begin(); j != i->end(); ++j) {
+			if (inV[*j]) {
+				componentsContainingV++;
+				if (componentsContainingV > 1) {
+					return true;
+				}
+				break;
 			}
 		}
-		if (thisComponentFound) {
-			componentsContainingV++;
-		}
 	}
-	return (componentsContainingV>1);
+	return false;
 }
 
 } /* namespace tdenum */

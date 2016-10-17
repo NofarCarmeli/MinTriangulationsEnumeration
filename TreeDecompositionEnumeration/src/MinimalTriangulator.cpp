@@ -118,7 +118,7 @@ public:
 NodeSetStaturator getSubstars(const Graph& g, const Graph& gi, Node v) {
 	NodeSet removedNodes = gi.getNeighbors(v);
 	removedNodes.insert(v);
-	vector< set<Node> > components = g.getComponentsEfficient(removedNodes);
+	vector< set<Node> > components = g.getComponents(removedNodes);
 	NodeSetStaturator saturator;
 	for (vector< set<Node> >::iterator it=components.begin(); it!=components.end(); ++it) {
 		saturator.markForSaturation(g.getNeighbors(*it));

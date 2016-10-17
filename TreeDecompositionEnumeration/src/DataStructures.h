@@ -37,6 +37,31 @@ public:
 	Node pop();
 };
 
+/*
+ * A minimum heap.
+ */
+class WeightedNodeSetQueue {
+	set< pair<int, set<Node> > > queue;
+public:
+	// True if the structure is empty.
+	bool isEmpty();
+	// True if the structure contains the given node set with the given weight.
+	bool isMember(const set<Node>& nodeSet, int weight);
+	// Adds the given node set to the structure with the given weight.
+	void insert(const set<Node>& nodeSet, int weight);
+	// Returns the maximal weighted node set, and removes it from the structure.
+	set<Node> pop();
+};
+
+class NodeSetSet {
+	set< set<Node> > sets;
+public:
+    // True if the structure contains the given node set.
+	bool isMember(const set<Node>& nodeSet);
+	// Adds the given node set to the structure.
+	void insert(const set<Node>& nodeSet);
+};
+
 
 /*
  * Constructs a subset of nodes in linear time in the size of the original set.

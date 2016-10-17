@@ -40,6 +40,37 @@ Node IncreasingWeightNodeQueue::pop() {
 }
 
 
+
+bool WeightedNodeSetQueue::isEmpty() {
+	return queue.empty();
+}
+
+bool WeightedNodeSetQueue::isMember(const set<Node>& nodeSet, int weight) {
+	return queue.find(make_pair(weight, nodeSet)) != queue.end();
+}
+
+void WeightedNodeSetQueue::insert(const set<Node>& nodeSet, int weight) {
+	queue.insert(make_pair(weight, nodeSet));
+}
+
+set<Node> WeightedNodeSetQueue::pop() {
+	set<Node> nodeSet = queue.begin()->second;
+	queue.erase(queue.begin());
+	return nodeSet;
+}
+
+
+
+bool NodeSetSet::isMember(const set<Node>& nodeSet) {
+	return sets.find(nodeSet) != sets.end();
+}
+
+void NodeSetSet::insert(const set<Node>& nodeSet) {
+	sets.insert(nodeSet);
+}
+
+
+
 NodeSetProducer::NodeSetProducer(int sizeOfOriginalNodeSet) :
 		isMember(sizeOfOriginalNodeSet, false){}
 

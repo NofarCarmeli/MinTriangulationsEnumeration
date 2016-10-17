@@ -3,6 +3,7 @@
 
 #include "Graph.h"
 #include "SeparatorsScorer.h"
+#include "DataStructures.h"
 
 namespace tdenum {
 
@@ -16,8 +17,8 @@ namespace tdenum {
 class MinimalSeparatorsEnumerator {
 	Graph graph;
 	SeparatorsScorer scorer;
-	set< pair<int,MinimalSeparator> > separatorsReturned;
-	set< pair<int,MinimalSeparator> > separatorsNotReturned;
+	WeightedNodeSetQueue separatorsToExtend;
+	NodeSetSet separatorsExtended;
 	void minimalSeparatorFound(const MinimalSeparator& s);
 public:
 	// Initialization
