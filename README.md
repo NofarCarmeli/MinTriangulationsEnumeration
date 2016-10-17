@@ -15,14 +15,15 @@ Supported file formats are: hg, sp, wcnf, uai, csv.
 * csv - each line holds name of variables in a clique.
 
 ### time_limit
-Time in seconds after which no more results are extended. The current one will finish extending, and all results that where found but not extended yet will be printed as well.
+Time in seconds after which no more results are extended. The current one will finish extending, and all results that were found but not extended yet will be printed as well.
 -1 means no time limit.
 Default is no time limit.
 
 ### triangualtion_heuristic
 The heuristic used for generating a single minimal triangulation.
-Options are: msc, degree, fill. Default is msc.
-* msc - using MSC-M algorithm.
+Options are: mcs, degree, fill. Default is mcs.
+* msc - using MCS-M algorithm.
+* lb - using LB-Triang algorithm with no heuristic for the order of vertices (faster than the following two).
 * degree - using LB-Triang algorithm with min-degree heuristic for the order of vertices.
 * fill - using LB-Triang algorithm with min-fill heuristic for the order of vertices.
 
