@@ -1,4 +1,5 @@
 #include "Converter.h"
+#include "DataStructures.h"
 #include <queue>
 #include <map>
 #include <utility>
@@ -31,31 +32,25 @@ set<MinimalSeparator> Converter::triangulationToMinimalSeparators(
 		const ChordalGraph& g) {
 	// initialize structures
 	set<MinimalSeparator> minimalSeparators; // holds the result
-	map<Node, int> weight; // default is zero
 	map<Node, bool> isVisited; // default is false
-	set< pair<int,Node> > mcsQueue;
-	NodeSet gNodes = g.getNodes();
-	for (NodeSetIterator i=gNodes.begin(); i!=gNodes.end(); ++i) {
-		mcsQueue.insert(pair<int,Node> (0,*i));
-	}
+	IncreasingWeightNodeQueue queue(g.getNumberOfNodes());
 	int previousNumberOfNeighbors = -1;
 	// start search
-	while (!mcsQueue.empty()) {
+	while (!queue.isEmpty()) {
 		// Pop node from queue
-		pair<int,Node> current = *mcsQueue.rbegin();
-		Node currentNode = current.second;
-		int currentNumberOfNeighbors = current.first;
-		mcsQueue.erase(current);
+		Node currentNode = queue.pop();
+		int currentNumberOfNeighbors = queue.getWeight(currentNode);
 		// Add a new minimal separator if relevant
 		if (currentNumberOfNeighbors <= previousNumberOfNeighbors) {
 			// add visited neighbors of currentNode to minimalSeparators
-			MinimalSeparator currentSeparator;
+			NodeSetProducer separatorProducer(g.getNumberOfNodes());
 			NodeSet neighbors = g.getNeighbors(currentNode);
 			for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
 				if (isVisited[*i]) {
-					currentSeparator.insert(*i);
+					separatorProducer.insert(*i);
 				}
 			}
+			MinimalSeparator currentSeparator = separatorProducer.produce();
 			if (!currentSeparator.empty()) {
 				minimalSeparators.insert(currentSeparator);
 			}
@@ -64,10 +59,7 @@ set<MinimalSeparator> Converter::triangulationToMinimalSeparators(
 		NodeSet neighbors = g.getNeighbors(currentNode);
 		for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
 			if (!isVisited[*i]) {
-				int oldWeight = weight[*i];
-				mcsQueue.erase(pair<int,Node> (oldWeight,*i));
-				mcsQueue.insert(pair<int,Node> (oldWeight+1,*i));
-				weight[*i]++;
+				queue.increaseWeight(*i);
 			}
 		}
 		isVisited[currentNode] = true;

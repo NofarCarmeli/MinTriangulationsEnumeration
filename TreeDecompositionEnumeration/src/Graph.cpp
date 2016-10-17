@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include "DataStructures.h"
 #include <queue>
 #include <iostream>
 
@@ -80,27 +81,26 @@ NodeSet Graph::getNeighbors(Node v) const {
 	return neighborSets[v];
 }
 
-
 /*
  * Returns the set of neighbors of nodes in the given node set without returning
  * nodes that are in the input node set
  */
 NodeSet Graph::getNeighbors(const NodeSet& inputSet) const {
-	NodeSet neighbors;
-	for (NodeSetIterator i = inputSet.begin(); i != inputSet.end(); ++i) {
+	NodeSetProducer neighborsProducer(numberOfNodes);
+	for (set<Node>::const_iterator i = inputSet.begin(); i != inputSet.end(); ++i) {
 		Node v = *i;
 		if (!isValidNode(v)) {
-			return NodeSet();
+			return set<Node>();
 		}
-		neighbors.insert(neighborSets[v].begin(),neighborSets[v].end());
+		for (NodeSet::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
+			neighborsProducer.insert(*j);
+		}
 	}
-	for (NodeSetIterator i = inputSet.begin(); i != inputSet.end(); ++i) {
-		Node v = *i;
-		neighbors.erase(v);
+	for (set<Node>::const_iterator i = inputSet.begin(); i != inputSet.end(); ++i) {
+		neighborsProducer.remove(*i);
 	}
-	return neighbors;
+	return neighborsProducer.produce();
 }
-
 
 /*
  * Returns sets representing the connected components received when removing the
@@ -119,6 +119,19 @@ set<NodeSet> Graph::getComponents(const NodeSet& inputSet) const {
 	}
 	int numberOfUnhandeledNodes = numberOfNodes - inputSet.size();
 	return getComponentsAux(visitedList, numberOfUnhandeledNodes);
+}
+
+vector< set<Node> > Graph::getComponentsEfficient(const NodeSet& removedNodes) const {
+	vector<int> visitedList(numberOfNodes, 0);
+	for (NodeSetIterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
+		Node v = *i;
+		if (!isValidNode(v)) {
+			return vector< set<Node> >();
+		}
+		visitedList[v] = -1;
+	}
+	int numberOfUnhandeledNodes = numberOfNodes - removedNodes.size();
+	return getComponentsAuxEfficient(visitedList, numberOfUnhandeledNodes);
 }
 
 /*
@@ -186,6 +199,42 @@ set<NodeSet> Graph::getComponentsAux(vector<int> visitedList, int numberOfUnhand
 			}
 		}
 		components.insert(currentComponent);
+	}
+	return components;
+}
+
+vector< set<Node> > Graph::getComponentsAuxEfficient(vector<int> visitedList, int numberOfUnhandeledNodes) const {
+	vector< set<Node> > components;
+	// Finds a new component in each iteration
+	while (numberOfUnhandeledNodes > 0) {
+		queue<Node> bfsQueue;
+		NodeSetProducer componentProducer(visitedList.size());
+		// Initialize the queue to contain a node not handled
+		for (Node i=0; i<numberOfNodes; i++) {
+			if (visitedList[i]==0) {
+				bfsQueue.push(i);
+				visitedList[i]=1;
+				componentProducer.insert(i);
+				numberOfUnhandeledNodes--;
+				break;
+			}
+		}
+		// BFS through the component
+		while (!bfsQueue.empty()) {
+			Node v = bfsQueue.front();
+			bfsQueue.pop();
+			for (NodeSetIterator i = neighborSets[v].begin();
+					i != neighborSets[v].end(); ++i) {
+				Node u = *i;
+				if (visitedList[u]==0) {
+					bfsQueue.push(u);
+					visitedList[u]=1;
+					componentProducer.insert(u);
+					numberOfUnhandeledNodes--;
+				}
+			}
+		}
+		components.push_back(componentProducer.produce());
 	}
 	return components;
 }

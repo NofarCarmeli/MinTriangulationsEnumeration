@@ -1,38 +1,11 @@
 #include "MinimalTriangulator.h"
+#include "DataStructures.h"
 #include <map>
 #include <algorithm>
 
 namespace tdenum {
 
 MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h) {}
-
-class IncreasingWeightNodeQueue {
-	vector<int> weight;
-	set< pair<int,Node> > queue;
-public:
-	IncreasingWeightNodeQueue(int numberOfNodes) : weight(numberOfNodes, 0) {
-		for (Node v = 0; v<numberOfNodes; v++) {
-			queue.insert(pair<int,Node> (0,v));
-		}
-	}
-	void increaseWeight(Node v) {
-		queue.erase(pair<int,Node> (weight[v],v));
-		weight[v]++;
-		queue.insert(pair<int,Node> (weight[v],v));
-	}
-	int getWeight(Node v) {
-		return weight[v];
-	}
-	bool isEmpty() {
-		return queue.empty();
-	}
-	Node pop() {
-		pair<int,Node> current = *queue.rbegin();
-		Node v = current.second;
-		queue.erase(current);
-		return v;
-	}
-};
 
 // implementing MSC-M algorithm
 ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
@@ -130,22 +103,34 @@ Node getMinFill(const Graph& g, const set<Node>& options) {
 	return bestNode;
 }
 
-// Returns the minimal separators included in the neighborhood of v
-set<NodeSet> getSubstars(const Graph& g, Node v) {
-	NodeSet removedNodes = g.getNeighbors(v);
-	removedNodes.insert(v);
-	set<NodeSet> components = g.getComponents(removedNodes);
-	set<NodeSet> substars;
-	for (set<NodeSet>::iterator it=components.begin(); it!=components.end(); ++it) {
-		substars.insert(g.getNeighbors(*it));
+class NodeSetStaturator {
+	set< set<Node> > toSaturate;
+public:
+	void markForSaturation(const set<Node>& nodeSet) {
+		toSaturate.insert(nodeSet);
 	}
-	return substars;
+	void saturate(Graph& g) {
+		g.saturateNodeSets(toSaturate);
+	}
+};
+
+// Returns the minimal separators included in the neighborhood of v
+NodeSetStaturator getSubstars(const Graph& g, const Graph& gi, Node v) {
+	NodeSet removedNodes = gi.getNeighbors(v);
+	removedNodes.insert(v);
+	vector< set<Node> > components = g.getComponentsEfficient(removedNodes);
+	NodeSetStaturator saturator;
+	for (vector< set<Node> >::iterator it=components.begin(); it!=components.end(); ++it) {
+		saturator.markForSaturation(g.getNeighbors(*it));
+	}
+	return saturator;
 }
 
 // Saturates the minimal separators included in the neighborhood of v
-void makeNodeLBSimplicial(Graph& g, Node v) {
-	set<NodeSet> substars =  getSubstars(g,v);
-	g.saturateNodeSets(substars);
+// g is the original graph, and gi is the graph in the last phase.
+void makeNodeLBSimplicial(const Graph& g, Graph& gi, Node v) {
+	NodeSetStaturator saturator =  getSubstars(g, gi, v);
+	saturator.saturate(gi);
 }
 
 //FIXME can be done faster (don't compute the score from scratch each time)
@@ -153,18 +138,18 @@ ChordalGraph getMinimalTriangulationUsingLBTriang(const Graph& g, TriangulationA
 	Graph result(g);
 	if (heuristic == LB_TRIANG) {
 		for (int v=0; v<g.getNumberOfNodes(); v++) {
-			makeNodeLBSimplicial(result,v);
+			makeNodeLBSimplicial(g, result, v);
 		}
 	} else {
 		set<Node> unhandledNodes = g.getNodes();
 		for (int i=0; i<g.getNumberOfNodes(); i++) {
 			Node v = i;
 			if (heuristic == MIN_DEGREE_LB_TRIANG) {
-				v = getMinDegree(result,unhandledNodes);
+				v = getMinDegree(result, unhandledNodes);
 			} else if (heuristic == MIN_FILL_LB_TRIANG) {
-				v = getMinFill(result,unhandledNodes);
+				v = getMinFill(result, unhandledNodes);
 			}
-			makeNodeLBSimplicial(result,v);
+			makeNodeLBSimplicial(g, result, v);
 			unhandledNodes.erase(v);
 		}
 	}
