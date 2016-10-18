@@ -16,8 +16,7 @@ int SeparatorsScorer::scoreSeparator(const MinimalSeparator& s) {
 		int fill_edges = 0;
 		for (MinimalSeparator::iterator it=s.begin(); it!=s.end(); ++it) {
 			for (MinimalSeparator::iterator jt=s.begin(); jt!=it; ++jt) {
-				NodeSet neighbors = graph.getNeighbors(*it);
-				if (neighbors.count(*jt) == 0) {
+				if (!graph.areNeighbors(*it, *jt)) {
 					fill_edges++;
 				}
 			}
