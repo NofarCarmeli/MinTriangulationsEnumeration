@@ -102,6 +102,10 @@ NodeSet Graph::getNeighbors(const NodeSet& inputSet) const {
 	return neighborsProducer.produce();
 }
 
+bool Graph::areNeighbors(Node u, Node v) const {
+	return neighborSets[u].find(v) != neighborSets[u].end();
+}
+
 vector< set<Node> > Graph::getComponents(const NodeSet& removedNodes) const {
 	vector<int> visitedList(numberOfNodes, 0);
 	for (NodeSetIterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
@@ -152,10 +156,9 @@ vector< set<Node> > Graph::getComponentsAux(vector<int> visitedList, int numberO
 }
 
 void Graph::print() {
-	NodeSet nodes = getNodes();
-	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
-		cout << *i << " has neighbors: ";
-		NodeSet s = getNeighbors(*i);
+	for (Node v=0; v<getNumberOfNodes(); v++) {
+		cout << v << " has neighbors: ";
+		NodeSet s = getNeighbors(v);
 		cout << "{ ";
 		for (NodeSetIterator jt = s.begin(); jt!=s.end(); ++jt) {
 			cout << *jt << " ";

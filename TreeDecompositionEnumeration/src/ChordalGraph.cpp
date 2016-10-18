@@ -6,6 +6,7 @@
  */
 
 #include "ChordalGraph.h"
+#include "DataStructures.h"
 #include <map>
 
 namespace tdenum {
@@ -35,43 +36,33 @@ int ChordalGraph::getFillIn(const Graph& origin) const {
 set<NodeSet> ChordalGraph::getMaximalCliques() const {
 	// initialize structures
 	set<NodeSet> cliques; // holds the result
-	map<Node, int> weight; // default is zero
 	map<Node, bool> isVisited; // default is false
-	set< pair<int,Node> > mcsQueue;
-	NodeSet gNodes = getNodes();
-	for (NodeSetIterator i=gNodes.begin(); i!=gNodes.end(); ++i) {
-		mcsQueue.insert(pair<int,Node> (0,*i));
-	}
+	IncreasingWeightNodeQueue queue(getNumberOfNodes());
 	int previousNumberOfNeighbors = -1;
 	Node previousNode = -1;
 	// start search
-	while (!mcsQueue.empty()) {
+	while (!queue.isEmpty()) {
 		// Pop node from queue
-		pair<int,Node> current = *mcsQueue.rbegin();
-		Node currentNode = current.second;
-		int currentNumberOfNeighbors = current.first;
-		mcsQueue.erase(current);
+		Node currentNode = queue.pop();
+		int currentNumberOfNeighbors = queue.getWeight(currentNode);
 		// Add a new clique if relevant
 		if (currentNumberOfNeighbors <= previousNumberOfNeighbors) {
 			// add currentNode and  its visited neighbors to cliques
-			NodeSet currentClique;
-			currentClique.insert(previousNode);
+			NodeSetProducer cliqueProducer(getNumberOfNodes());
+			cliqueProducer.insert(previousNode);
 			NodeSet neighbors = getNeighbors(previousNode);
 			for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
 				if (isVisited[*i]) {
-					currentClique.insert(*i);
+					cliqueProducer.insert(*i);
 				}
 			}
-			cliques.insert(currentClique);
+			cliques.insert(cliqueProducer.produce());
 		}
 		// Update structures
 		NodeSet neighbors = getNeighbors(currentNode);
 		for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
 			if (!isVisited[*i]) {
-				int oldWeight = weight[*i];
-				mcsQueue.erase(pair<int,Node> (oldWeight,*i));
-				mcsQueue.insert(pair<int,Node> (oldWeight+1,*i));
-				weight[*i]++;
+				queue.increaseWeight(*i);
 			}
 		}
 		isVisited[currentNode] = true;
@@ -79,13 +70,13 @@ set<NodeSet> ChordalGraph::getMaximalCliques() const {
 		previousNode = currentNode;
 	}
 	// add the last clique
-	NodeSet currentClique;
-	currentClique.insert(previousNode);
+	NodeSetProducer cliqueProducer(getNumberOfNodes());
+	cliqueProducer.insert(previousNode);
 	NodeSet neighbors = getNeighbors(previousNode);
 	for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
-		currentClique.insert(*i);
+		cliqueProducer.insert(*i);
 	}
-	cliques.insert(currentClique);
+	cliques.insert(cliqueProducer.produce());
 	return cliques;
 }
 
@@ -100,17 +91,17 @@ int ChordalGraph::getTreeWidth() const {
 	return maxSize - 1;
 }
 
-set< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
-	set< set<Node> > edges;
-	NodeSet nodes = getNodes();
-	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
-		NodeSet neighbors = getNeighbors(*i);
+vector< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
+	vector< set<Node> > edges;
+	for (Node v=0; v<getNumberOfNodes(); v++) {
+		NodeSet neighbors = getNeighbors(v);
 		for (NodeSetIterator j=neighbors.begin(); j!=neighbors.end(); ++j) {
-			if (*i <= *j && origin.getNeighbors(*i).count(*j) == 0) {
+			Node u = *j;
+			if (v <= u && !origin.areNeighbors(v,u)) {
 				set<Node> edge;
-				edge.insert(*i);
-				edge.insert(*j);
-				edges.insert(edge);
+				edge.insert(v);
+				edge.insert(u);
+				edges.push_back(edge);
 			}
 		}
 	}
@@ -118,14 +109,11 @@ set< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
 }
 
 void ChordalGraph::printTriangulation(const Graph& origin) const {
-	NodeSet nodes = getNodes();
-	for (NodeSetIterator i=nodes.begin(); i!=nodes.end(); ++i) {
-		NodeSet neighbors = getNeighbors(*i);
-		for (NodeSetIterator j=neighbors.begin(); j!=neighbors.end(); ++j) {
-			if (*i <= *j && origin.getNeighbors(*i).count(*j) == 0) {
-				cout << *i << "-" << *j << endl;
-			}
-		}
+	vector< set<Node> > fillEdges = getFillEdges(origin);
+	for (vector< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
+		Node u = *(it->begin());
+		Node v = *(++it->begin());
+		cout << u << "-" << v << endl;
 	}
 }
 

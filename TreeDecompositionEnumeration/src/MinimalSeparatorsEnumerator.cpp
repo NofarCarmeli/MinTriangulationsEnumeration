@@ -8,7 +8,6 @@ namespace tdenum {
 MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g, SeparatorsScoringCriterion c) :
 	graph(g), scorer(g,c) {
 	// Initialize separatorsNotReturned according to the initialization phase
-	NodeSet nodes = graph.getNodes();
 	for (Node v = 0; v < g.getNumberOfNodes(); v++) {
 		NodeSet vAndNeighbors = graph.getNeighbors(v);
 		vAndNeighbors.insert(v);

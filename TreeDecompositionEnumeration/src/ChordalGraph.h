@@ -25,7 +25,7 @@ public:
 	// Returns the tree-width of the graph
 	int getTreeWidth() const;
 	// Returns the edges in this graph and not in the origin
-	set< set<Node> > getFillEdges(const Graph& origin) const;
+	vector< set<Node> > getFillEdges(const Graph& origin) const;
 	// Prints the edges in this graph and not in the origin
 	void printTriangulation(const Graph& origin) const;
 };

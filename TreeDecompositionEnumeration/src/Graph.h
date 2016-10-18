@@ -43,6 +43,8 @@ public:
 	NodeSet getNeighbors(Node v) const;
 	// Returns the neighbors of the given node set
 	NodeSet getNeighbors(const NodeSet& s) const;
+	// Returns whether there is an edge between the given two nodes
+	bool areNeighbors(Node u, Node v) const;
 	// Returns the set of components obtained by removing the given node set
 	vector< set<Node> > getComponents(const NodeSet& removedNodes) const;
 	// Prints the graph

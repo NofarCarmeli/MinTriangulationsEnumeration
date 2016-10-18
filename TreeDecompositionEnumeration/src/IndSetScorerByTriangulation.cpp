@@ -29,12 +29,14 @@ int IndSetScorerByTriangulation::scoreIndependentSet(const set<MinimalSeparator>
 	} else if (criterion == DIFFERENECE) {
 		int score = 0;
 		ChordalGraph g = Converter::minimalSeparatorsToTriangulation(graph, s);
-		set< set<Node> > fillEdges = g.getFillEdges(graph);
-		for (set< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
-			if (seenFillEdges.count(*it) > 0) {
+		vector< set<Node> > fillEdges = g.getFillEdges(graph);
+		for (vector< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
+			if (seenFillEdges.find(*it) != seenFillEdges.end()) {
 				score++;
 			}
 		}
+		//FIXME seenFillEdges should be updated.
+		// MaximalIndependentSetsEnumerator assumes the score is invariant over time.
 		return score;
 	}
 	return 0;
