@@ -32,7 +32,7 @@ The order of extending the generated minimal triangulations.
 Options are: width, fill, difference, sepsize, none. Default is none.
 * width - lowest width first.
 * fill - lowest number of fill edges first.
-* difference - lowest number of fill edges that were seen in previously generated triangulations.
+* difference - lowest number of fill edges that were seen in previously extended triangulations.
 * sepsize - lowest size of maximal separator size.
 
 ### separators_order
