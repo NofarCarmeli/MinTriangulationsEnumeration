@@ -20,6 +20,10 @@ public:
 	 * receives an independent set and returns a score.
 	 */
 	virtual int scoreIndependentSet(const set<T>& s) = 0;
+	/**
+	 * Marks the given set as used. Useful is case of scoring relative to used sets.
+	 */
+	virtual void independentSetUsed(const set<T>& s) = 0;
 };
 
 } /* namespace tdenum */

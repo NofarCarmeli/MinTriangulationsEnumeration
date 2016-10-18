@@ -19,7 +19,7 @@ class MaximalIndependentSetsEnumerator {
 	IndependentSetExtender<T>& extender;
 	IndependentSetScorer<T>& scorer;
 	set<T> nodesGenerated;
-	set< pair<int, set<T> > > maxIndependentSetsReturned;
+	set< set<T> > maxIndependentSetsReturned;
 	set< pair<int, set<T> > > maxIndependentSetsNotReturned;
 
 	set<T> extendSetInDirectionOfNode(const set<T>& set, const T& node);
@@ -98,8 +98,8 @@ set<T> MaximalIndependentSetsEnumerator<T>::extendSetInDirectionOfNode(
  */
 template<class T>
 void MaximalIndependentSetsEnumerator<T>::maxIndependentSetFound(const set<T>& s) {
-	pair<int, set<T> > scoredIndSet = make_pair(scorer.scoreIndependentSet(s), s);
-	if (maxIndependentSetsReturned.find(scoredIndSet) == maxIndependentSetsReturned.end()) {
+	if (maxIndependentSetsReturned.find(s) == maxIndependentSetsReturned.end()) {
+		pair<int, set<T> > scoredIndSet = make_pair(scorer.scoreIndependentSet(s), s);
 		maxIndependentSetsNotReturned.insert(scoredIndSet);
 	}
 }
@@ -116,8 +116,20 @@ set<T> MaximalIndependentSetsEnumerator<T>::next() {
 	}
 	// Choose set to extend
 	pair<int, set<T> > currentSet = *maxIndependentSetsNotReturned.begin();
+	// Support for changing scores: Maybe choose a different set if the score has changed
+	int currentScore = scorer.scoreIndependentSet(currentSet.second);
+	while (currentScore > currentSet.first) {
+		// Update weight
+		pair<int, set<T> > rescoredSet = make_pair(currentScore, currentSet.second);
+		maxIndependentSetsNotReturned.erase(currentSet);
+		maxIndependentSetsNotReturned.insert(rescoredSet);
+		// Choose new set
+		currentSet = *maxIndependentSetsNotReturned.begin();
+		currentScore = scorer.scoreIndependentSet(currentSet.second);
+	}
 	// Transfer set to the list of returned sets
-	maxIndependentSetsReturned.insert(currentSet);
+	scorer.independentSetUsed(currentSet.second);
+	maxIndependentSetsReturned.insert(currentSet.second);
 	maxIndependentSetsNotReturned.erase(currentSet);
 	// Process set to create new sets
 	for (typename set<T>::iterator i = nodesGenerated.begin(); i!=nodesGenerated.end(); ++i) {
@@ -128,9 +140,9 @@ set<T> MaximalIndependentSetsEnumerator<T>::next() {
 		// generate a new node and extend returned sets in this direction
 		T generatedNode = graph.nextNode();
 		nodesGenerated.insert(generatedNode);
-		for (typename set< pair < int,set<T> > >::iterator i=maxIndependentSetsReturned.begin();
+		for (typename set< set<T> >::iterator i=maxIndependentSetsReturned.begin();
 				i!=maxIndependentSetsReturned.end(); ++i) {
-			set<T> generatedSet = extendSetInDirectionOfNode(i->second, generatedNode);
+			set<T> generatedSet = extendSetInDirectionOfNode(*i, generatedNode);
 			maxIndependentSetFound(generatedSet);
 		}
 	}

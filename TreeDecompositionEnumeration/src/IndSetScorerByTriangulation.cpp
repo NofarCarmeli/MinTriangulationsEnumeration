@@ -35,11 +35,15 @@ int IndSetScorerByTriangulation::scoreIndependentSet(const set<MinimalSeparator>
 				score++;
 			}
 		}
-		//FIXME seenFillEdges should be updated.
-		// MaximalIndependentSetsEnumerator assumes the score is invariant over time.
 		return score;
 	}
 	return 0;
+}
+
+void IndSetScorerByTriangulation::independentSetUsed(const set<MinimalSeparator>& s) {
+	ChordalGraph g = Converter::minimalSeparatorsToTriangulation(graph, s);
+	vector< set<Node> > fillEdges = g.getFillEdges(graph);
+	seenFillEdges.insert(fillEdges.begin(), fillEdges.end());
 }
 
 } /* namespace tdenum */
