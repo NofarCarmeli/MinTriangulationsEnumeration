@@ -103,6 +103,9 @@ int main(int argc, char* argv[]) {
 			heuristic = INITIAL_FILL_LB_TRIANG;
 		} else if (heuristicName == "lb") {
 			heuristic = LB_TRIANG;
+		} else {
+			cout << "Triangulation algorithm not recognized" << endl;
+			return 0;
 		}
 	}
 	TriangulationScoringCriterion criterion = NONE;
@@ -119,6 +122,9 @@ int main(int argc, char* argv[]) {
 			criterion = MAX_SEP_SIZE;
 		} else if (criterionName == "none") {
 			criterion = NONE;
+		} else {
+			cout << "Triangulation scoring criterion not recognized" << endl;
+			return 0;
 		}
 	}
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
@@ -131,6 +137,9 @@ int main(int argc, char* argv[]) {
 			separatorsOrder = UNIFORM;
 		} else if (criterionName == "fill") {
 			separatorsOrder = FILL_EDGES;
+		} else {
+			cout << "Seperators scoring criterion not recognized" << endl;
+			return 0;
 		}
 	}
 	outputFileName = outputFileName + ".csv";
