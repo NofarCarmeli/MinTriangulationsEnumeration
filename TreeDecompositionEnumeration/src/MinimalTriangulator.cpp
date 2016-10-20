@@ -58,20 +58,6 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 	return triangulation;
 }
 
-// assumes options is not empty
-Node getMinDegree(const Graph& g, set<Node>& options) {
-	set<Node>::iterator it = options.begin();
-	Node bestNode = *it;
-	int minDegree = g.getNeighbors(*it).size();
-	for (;it!=options.end(); ++it) {
-		int currentDegree = g.getNeighbors(*it).size();
-		if (currentDegree < minDegree) {
-			bestNode = *it;
-			minDegree = currentDegree;
-		}
-	}
-	return bestNode;
-}
 
 int getFill(const Graph& g, Node v) {
 	set<Node> neighborsSet = g.getNeighbors(v);
@@ -86,21 +72,6 @@ int getFill(const Graph& g, Node v) {
 		twiceFillEdges+= (notNeighborsOfCurrentNode.size()-1);
 	}
 	return twiceFillEdges/2;
-}
-
-// assumes options is not empty
-Node getMinFill(const Graph& g, const set<Node>& options) {
-	set<Node>::iterator it = options.begin();
-	Node bestNode = *it;
-	int minFill = getFill(g,*it);
-	for (;it!=options.end(); ++it) {
-		int currentFill = getFill(g,*it);
-		if (currentFill < minFill) {
-			bestNode = *it;
-			minFill = currentFill;
-		}
-	}
-	return bestNode;
 }
 
 class NodeSetStaturator {
@@ -133,24 +104,57 @@ void makeNodeLBSimplicial(const Graph& g, Graph& gi, Node v) {
 	saturator.saturate(gi);
 }
 
-//FIXME can be done faster (don't compute the score from scratch each time)
+class NodeQueue {
+	set< pair<int,Node> > queue;
+	const Graph& graph;
+	TriangulationAlgorithm heuristic;
+	int score(Node v) {
+		if (heuristic == MIN_DEGREE_LB_TRIANG || heuristic == INITIAL_DEGREE_LB_TRIANG) {
+			return graph.getNeighbors(v).size();
+		} else if (heuristic == MIN_FILL_LB_TRIANG || heuristic == INITIAL_FILL_LB_TRIANG) {
+			return getFill(graph, v);
+		}
+		return 0;
+	}
+public:
+	NodeQueue(const Graph& g, TriangulationAlgorithm h) : graph(g), heuristic(h) {
+		for (Node v=0; v<g.getNumberOfNodes(); v++) {
+			queue.insert(make_pair(score(v), v));
+		}
+	}
+	Node pop() {
+		Node top = queue.begin()->second;
+		// check if score was updates in relevant heuristics
+		if (heuristic == MIN_DEGREE_LB_TRIANG || heuristic == MIN_FILL_LB_TRIANG) {
+			int savedScore = queue.begin()->first;
+			int currentScore = score(top);
+			while (currentScore > savedScore) {
+				queue.erase(queue.begin());
+				queue.insert(make_pair(currentScore,top));
+				top = queue.begin()->second;
+				savedScore = queue.begin()->first;
+				currentScore = score(top);
+			}
+		}
+		queue.erase(queue.begin());
+		return top;
+	}
+	bool isEmpty() {
+		return queue.empty();
+	}
+};
+
+
 ChordalGraph getMinimalTriangulationUsingLBTriang(const Graph& g, TriangulationAlgorithm heuristic) {
 	Graph result(g);
 	if (heuristic == LB_TRIANG) {
-		for (int v=0; v<g.getNumberOfNodes(); v++) {
+		for (Node v=0; v<g.getNumberOfNodes(); v++) {
 			makeNodeLBSimplicial(g, result, v);
 		}
 	} else {
-		set<Node> unhandledNodes = g.getNodes();
-		for (int i=0; i<g.getNumberOfNodes(); i++) {
-			Node v = i;
-			if (heuristic == MIN_DEGREE_LB_TRIANG) {
-				v = getMinDegree(result, unhandledNodes);
-			} else if (heuristic == MIN_FILL_LB_TRIANG) {
-				v = getMinFill(result, unhandledNodes);
-			}
-			makeNodeLBSimplicial(g, result, v);
-			unhandledNodes.erase(v);
+		NodeQueue queue(result, heuristic);
+		while (!queue.isEmpty()) {
+			makeNodeLBSimplicial(g, result, queue.pop());
 		}
 	}
 	return result;

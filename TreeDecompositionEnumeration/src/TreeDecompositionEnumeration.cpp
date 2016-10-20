@@ -97,6 +97,10 @@ int main(int argc, char* argv[]) {
 			heuristic = MIN_DEGREE_LB_TRIANG;
 		} else if (heuristicName == "fill") {
 			heuristic = MIN_FILL_LB_TRIANG;
+		}  else if (heuristicName == "initialDegree") {
+			heuristic = INITIAL_DEGREE_LB_TRIANG;
+		} else if (heuristicName == "initialFill") {
+			heuristic = INITIAL_FILL_LB_TRIANG;
 		} else if (heuristicName == "lb") {
 			heuristic = LB_TRIANG;
 		}
