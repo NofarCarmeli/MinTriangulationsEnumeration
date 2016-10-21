@@ -6,63 +6,10 @@
 #include <string>
 #include "GraphReader.h"
 #include "MinimalTriangulationsEnumerator.h"
+#include "ResultsHandler.h"
 using namespace std;
 using namespace tdenum;
 
-
-class Result {
-	int number;
-	double time;
-	int fill;
-	int width;
-	Graph origin;
-	ChordalGraph triangulation;
-public:
-	Result() : number(0), time(0), fill(0), width(0) {}
-	Result(int index, double t, Graph g, ChordalGraph triangulation) :
-			number(index), time(t), origin(g), triangulation(triangulation) {
-		fill = triangulation.getFillIn(g);
-		width = triangulation.getTreeWidth();
-	}
-	int getFill() { return fill; }
-	int getWidth() { return width; }
-	void printDetails() {
-		cout << "Result number " << number << ", Time " << time << " seconds, Width "
-				<< width << ", Fill " << fill << endl;
-	}
-	void printEdges() {
-		triangulation.printTriangulation(origin);
-		cout << endl;
-	}
-	void printCsv(ofstream& output) {
-		output << number << ", " << time << ", "
-				<< width << ", " << fill << endl;
-	}
-	static void printCsvHeader(ofstream& output) {
-		output << "result number, time in seconds, width, fill" << endl;
-	}
-};
-
-void processResult(double totalTimeInSeconds, const Graph& g, int& resultNumber,
-		Result& minWidth, Result& minFill, vector<Result>& results,
-		ofstream& output, const ChordalGraph& triangulation) {
-	Result res(resultNumber, totalTimeInSeconds, g, triangulation);
-	results.push_back(res);
-	if (resultNumber == 1) {
-		minWidth = res;
-		minFill = res;
-		Result::printCsvHeader(output);
-	} else {
-		if (res.getWidth() < minWidth.getWidth()) {
-			minWidth = res;
-		}
-		if (res.getFill() < minFill.getFill()) {
-			minFill = res;
-		}
-	}
-	res.printCsv(output);
-	resultNumber++;
-}
 
 /**
  * First parameter is the graph file path. Second is timeout in seconds.
@@ -144,37 +91,27 @@ int main(int argc, char* argv[]) {
 	}
 	outputFileName = outputFileName + ".csv";
 
-	// Manage files
-	clock_t startTime = clock();
+	// Manage files and initialize variables
 	Graph g = GraphReader::read(inputFileName);
 	ofstream output;
 	output.open(outputFileName.c_str());
 	cout << setprecision(2);
-	if (double(clock() - startTime) > 0) {
-		cout << "Reading the graph took " << double(clock() - startTime) / CLOCKS_PER_SEC
-				<< " seconds" << endl;
-	}
 	cout << "Starting enumeration for "  << inputFileName << endl;
-
-	// initialize variables
-	int resultNumber = 1;
-	double totalTimeInSeconds = 0;
-	vector<Result> results;
-	Result minWidth, minFill;
+	clock_t startTime = clock();
+	ResultsHandler results(g, output, true);
 	bool timeLimitExceeded = false;
-	startTime = clock();
 
 	// generate and print the results to output file
 	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder, heuristic);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
-		totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
-		processResult(totalTimeInSeconds, g, resultNumber, minWidth, minFill, results, output, triangulation);
+		results.newResult(triangulation);
+		double totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
 		if (isTimeLimited && totalTimeInSeconds >= timeLimitInSeconds) {
 			timeLimitExceeded = true;
 			vector<ChordalGraph> moreResults = enumerator.getGeneratedNotReturned();
 			for (unsigned int i=0; i<moreResults.size(); i++) {
-				processResult(totalTimeInSeconds, g, resultNumber, minWidth, minFill, results, output, moreResults[i]);
+				results.newResult(moreResults[i]);
 			}
 			break;
 		}
@@ -187,14 +124,7 @@ int main(int argc, char* argv[]) {
 	} else {
 		cout << "All minimal triangulations were generated! ";
 	}
-	cout << resultNumber-1 << " results found, ";
-	cout << "Total time " << totalTimeInSeconds << " seconds." << endl;
-	cout << "First result: ";
-	results[0].printDetails();
-	cout << "Lowest fill: ";
-	minFill.printDetails();
-	cout << "Lowest width: ";
-	minWidth.printDetails();
+	results.printSummary(cout);
 
 	return 0;
 }
