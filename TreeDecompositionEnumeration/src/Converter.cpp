@@ -44,8 +44,8 @@ set<MinimalSeparator> Converter::triangulationToMinimalSeparators(
 		if (currentNumberOfNeighbors <= previousNumberOfNeighbors) {
 			// add visited neighbors of currentNode to minimalSeparators
 			NodeSetProducer separatorProducer(g.getNumberOfNodes());
-			NodeSet neighbors = g.getNeighbors(currentNode);
-			for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
+			for (NodeSetIterator i = g.getNeighbors(currentNode).begin();
+					i!=g.getNeighbors(currentNode).end(); ++i) {
 				if (isVisited[*i]) {
 					separatorProducer.insert(*i);
 				}
@@ -56,8 +56,8 @@ set<MinimalSeparator> Converter::triangulationToMinimalSeparators(
 			}
 		}
 		// Update structures
-		NodeSet neighbors = g.getNeighbors(currentNode);
-		for (NodeSetIterator i = neighbors.begin(); i!=neighbors.end(); ++i) {
+		for (NodeSetIterator i = g.getNeighbors(currentNode).begin();
+				i!=g.getNeighbors(currentNode).end(); ++i) {
 			if (!isVisited[*i]) {
 				queue.increaseWeight(*i);
 			}

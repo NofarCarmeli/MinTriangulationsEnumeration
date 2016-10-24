@@ -199,10 +199,8 @@ vector<int> Graph::getComponentsMap(const NodeSet& removedNodes) const {
 
 void Graph::print() {
 	for (Node v=0; v<getNumberOfNodes(); v++) {
-		cout << v << " has neighbors: ";
-		NodeSet s = getNeighbors(v);
-		cout << "{ ";
-		for (NodeSetIterator jt = s.begin(); jt!=s.end(); ++jt) {
+		cout << v << " has neighbors: {";
+		for (NodeSetIterator jt = getNeighbors(v).begin(); jt!=getNeighbors(v).end(); ++jt) {
 			cout << *jt << " ";
 		}
 		cout << "}" << endl;

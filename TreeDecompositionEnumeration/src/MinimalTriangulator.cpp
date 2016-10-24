@@ -59,11 +59,11 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 
 
 int getFill(const Graph& g, Node v) {
-	set<Node> neighborsSet = g.getNeighbors(v);
+	const set<Node>& neighborsSet = g.getNeighbors(v);
 	int twiceFillEdges = 0;
 	// for every node in the neighborhood, add the number of non-neighbors
 	for (set<Node>::iterator it=neighborsSet.begin(); it!=neighborsSet.end(); ++it) {
-		set<Node> neighborsOfCurrentNode = g.getNeighbors(*it);
+		const set<Node>& neighborsOfCurrentNode = g.getNeighbors(*it);
 		set<Node> notNeighborsOfCurrentNode;
 		set_difference(neighborsSet.begin(), neighborsSet.end(),
 				neighborsOfCurrentNode.begin(), neighborsOfCurrentNode.end(),
