@@ -27,19 +27,5 @@ ChordalGraph MinimalTriangulationsEnumerator::next() {
 	return Converter::minimalSeparatorsToTriangulation(graph, setsEnumerator.next());
 }
 
-/**
- * Returns all the results that were generated as part of the calculations
- * but not returned yet. Useful in case of partial enumeration when you
- * don't want to invest more time in generating more results.
- */
-vector<ChordalGraph> MinimalTriangulationsEnumerator::getGeneratedNotReturned() {
-	vector< set<MinimalSeparator> > sets = setsEnumerator.getGeneratedNotReturned();
-	vector<ChordalGraph> result(sets.size());
-	for (unsigned int i=0; i<sets.size(); i++) {
-		result[i] = Converter::minimalSeparatorsToTriangulation(graph, sets[i]);
-	}
-	return result;
-}
-
 } /* namespace tdenum */
 

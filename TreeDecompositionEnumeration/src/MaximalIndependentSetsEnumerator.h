@@ -7,6 +7,8 @@
 
 namespace tdenum {
 
+enum AlgorithmStep {BEGINNING, ITERATING_NODES, ITERATING_SETS};
+
 /**
  * Enumerates the maximal independent sets of a graph given by a succinct graph
  * representation with an independent set expansion.
@@ -15,15 +17,31 @@ namespace tdenum {
  */
 template<class T>
 class MaximalIndependentSetsEnumerator {
+
+	// Tools
 	SuccinctGraphRepresentation<T>& graph;
 	IndependentSetExtender<T>& extender;
 	IndependentSetScorer<T>& scorer;
-	set<T> nodesGenerated;
-	set< set<T> > maxIndependentSetsReturned;
-	set< pair<int, set<T> > > maxIndependentSetsNotReturned;
 
+	// State
+	set<T> nodesGenerated;
+	set< set<T> > setsExtended;
+	set< set<T> > setsNotExtended;
+	set< pair<int, set<T> > > extendingQueue;
+	bool nextSetReady;
+	set<T> nextIndependentSet;
+	AlgorithmStep step;
+	// State for case ITERATING_NODES
+	typename set<T>::iterator nodesIterator;
+	set<T> currentSet;
+	// State for case ITERATING_SETS
+	typename set< set<T> >::iterator setsIterator;
+	T currentNode;
+
+	void getNextSetToExtend();
 	set<T> extendSetInDirectionOfNode(const set<T>& set, const T& node);
-	void maxIndependentSetFound(const set<T>& set);
+	bool newSetFound(const set<T>& set);
+	bool runFullEnumeration();
 public:
 	/**
 	 * Initialization. Receives a succinct graph representation with an
@@ -39,39 +57,35 @@ public:
 	 * Returns another maximal independent set.
 	 */
 	set<T> next();
-
-	/**
-	 * Returns all the results that were generated as part of the calculations
-	 * but not returned yet. Useful in case of partial enumeration when you
-	 * don't want to invest more time in generating more results.
-	 */
-	vector< set<T> > getGeneratedNotReturned();
 };
 
 
 
-
-
-/*
- * Initialization
+/**
+ * Saves the next set to extend to currentSet.
  */
 template<class T>
-MaximalIndependentSetsEnumerator<T>::MaximalIndependentSetsEnumerator(
-		SuccinctGraphRepresentation<T>& g, IndependentSetExtender<T>& e,
-		IndependentSetScorer<T>& s) : graph(g), extender(e), scorer (s) {
-	set<T> firstIndSet = extender.extendToMaxIndependentSet(set<T>());
-	pair<int, set<T> > scoredFirstIndSet = make_pair(
-			scorer.scoreIndependentSet(firstIndSet), firstIndSet);
-	maxIndependentSetsNotReturned.insert(scoredFirstIndSet);
+void MaximalIndependentSetsEnumerator<T>::getNextSetToExtend() {
+	pair<int, set<T> > currentScoredSet = *extendingQueue.begin();
+	// Support for changing scores: Maybe choose a different set if the score has changed
+	int currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
+	while (currentScore > currentScoredSet.first) {
+		// Update weight
+		pair<int, set<T> > rescoredSet = make_pair(currentScore, currentScoredSet.second);
+		extendingQueue.erase(currentScoredSet);
+		extendingQueue.insert(rescoredSet);
+		// Choose new set
+		currentScoredSet = *extendingQueue.begin();
+		currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
+	}
+	currentSet = currentScoredSet.second;
+	// Update that this set is being extended
+	scorer.independentSetUsed(currentSet);
+	setsExtended.insert(currentSet);
+	setsNotExtended.erase(currentSet);
+	extendingQueue.erase(currentScoredSet);
 }
 
-/*
- * Outputs whether there is a maximal independent set not yet returned.
- */
-template<class T>
-bool MaximalIndependentSetsEnumerator<T>::hasNext() {
-	return !maxIndependentSetsNotReturned.empty();
-}
 
 /*
  * Input: maximal independent set and node.
@@ -91,18 +105,128 @@ set<T> MaximalIndependentSetsEnumerator<T>::extendSetInDirectionOfNode(
 	return extender.extendToMaxIndependentSet(baseNodes);
 }
 
+
 /*
  * Input: maximal independent set.
- * If this set was not found before, it is inserted to the set of not
- * returned independent sets.
+ * If this set is new, it is inserted to setsNotExtended and extendingQueue,
+ * and saved to nextIndependentSet.
+ * Returns whether this set was new.
  */
 template<class T>
-void MaximalIndependentSetsEnumerator<T>::maxIndependentSetFound(const set<T>& s) {
-	if (maxIndependentSetsReturned.find(s) == maxIndependentSetsReturned.end()) {
-		pair<int, set<T> > scoredIndSet = make_pair(scorer.scoreIndependentSet(s), s);
-		maxIndependentSetsNotReturned.insert(scoredIndSet);
+bool MaximalIndependentSetsEnumerator<T>::newSetFound(const set<T>& generatedSet) {
+	if (setsExtended.find(generatedSet) == setsExtended.end()) {
+		pair<typename set< set<T> >::iterator, bool> insertionReturnValue = setsNotExtended.insert(generatedSet);
+		if (insertionReturnValue.second) {
+			extendingQueue.insert(make_pair(scorer.scoreIndependentSet(generatedSet), generatedSet));
+			nextIndependentSet = generatedSet;
+			nextSetReady = true;
+			return true;
+		}
 	}
+	return false;
 }
+
+
+template<class T>
+bool MaximalIndependentSetsEnumerator<T>::runFullEnumeration() {
+	while (!extendingQueue.empty()) {
+		getNextSetToExtend();
+		for (nodesIterator = nodesGenerated.begin();
+				nodesIterator != nodesGenerated.end(); ++nodesIterator) {
+			set<T> generatedSet = extendSetInDirectionOfNode(currentSet, *nodesIterator);
+			if (newSetFound(generatedSet)) {
+				step = ITERATING_NODES;
+				return true;
+			}
+		}
+		while(setsNotExtended.empty() && graph.hasNextNode()) {
+			// generate a new node and extend returned sets in this direction
+			currentNode = graph.nextNode();
+			nodesGenerated.insert(currentNode);
+			for (setsIterator = setsExtended.begin();
+					setsIterator != setsExtended.end(); ++setsIterator) {
+				set<T> generatedSet = extendSetInDirectionOfNode(*setsIterator, currentNode);
+				if (newSetFound(generatedSet)) {
+					step = ITERATING_SETS;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+/*
+ * Initialization
+ */
+template<class T>
+MaximalIndependentSetsEnumerator<T>::MaximalIndependentSetsEnumerator(
+		SuccinctGraphRepresentation<T>& g, IndependentSetExtender<T>& e,
+		IndependentSetScorer<T>& s) : graph(g), extender(e), scorer (s) {
+	newSetFound(extender.extendToMaxIndependentSet(set<T>()));
+	step = BEGINNING;
+}
+
+
+/*
+ * Outputs whether there is a maximal independent set not yet returned.
+ */
+template<class T>
+bool MaximalIndependentSetsEnumerator<T>::hasNext() {
+	if (nextSetReady) {
+		return true;
+	} else {
+		if (step == BEGINNING) {
+			return runFullEnumeration();
+		} else if (step == ITERATING_NODES) {
+			for (; nodesIterator != nodesGenerated.end(); ++nodesIterator) {
+				set<T> generatedSet = extendSetInDirectionOfNode(currentSet, *nodesIterator);
+				if (newSetFound(generatedSet)) {
+					step = ITERATING_NODES;
+					return true;
+				}
+			}
+			while(setsNotExtended.empty() && graph.hasNextNode()) {
+				// generate a new node and extend returned sets in this direction
+				currentNode = graph.nextNode();
+				nodesGenerated.insert(currentNode);
+				for (setsIterator = setsExtended.begin(); setsIterator != setsExtended.end(); ++setsIterator) {
+					set<T> generatedSet = extendSetInDirectionOfNode(*setsIterator, currentNode);
+					if (newSetFound(generatedSet)) {
+						step = ITERATING_SETS;
+						return true;
+					}
+				}
+			}
+			return runFullEnumeration();
+		} else if (step == ITERATING_SETS) {
+			for (; setsIterator != setsExtended.end(); ++setsIterator) {
+				set<T> generatedSet = extendSetInDirectionOfNode(*setsIterator, currentNode);
+				if (newSetFound(generatedSet)) {
+					step = ITERATING_SETS;
+					return true;
+				}
+			}
+			while(setsNotExtended.empty() && graph.hasNextNode()) {
+				// generate a new node and extend returned sets in this direction
+				currentNode = graph.nextNode();
+				nodesGenerated.insert(currentNode);
+				for (setsIterator = setsExtended.begin(); setsIterator != setsExtended.end(); ++setsIterator) {
+					set<T> generatedSet = extendSetInDirectionOfNode(*setsIterator, currentNode);
+					if (newSetFound(generatedSet)) {
+						step = ITERATING_SETS;
+						return true;
+					}
+				}
+			}
+			return runFullEnumeration();
+		}
+	}
+	// We covered all cases so we should never get here
+	return false;
+}
+
 
 /*
  * Processes a maximal independent set that was not yet processed, transfers it
@@ -110,58 +234,11 @@ void MaximalIndependentSetsEnumerator<T>::maxIndependentSetFound(const set<T>& s
  */
 template<class T>
 set<T> MaximalIndependentSetsEnumerator<T>::next() {
-	// Verify that there is another set
-	if (!hasNext()) {
-		return set<T>();
+	if (nextSetReady || hasNext()) {
+		nextSetReady = false;
+		return nextIndependentSet;
 	}
-	// Choose set to extend
-	pair<int, set<T> > currentSet = *maxIndependentSetsNotReturned.begin();
-	// Support for changing scores: Maybe choose a different set if the score has changed
-	int currentScore = scorer.scoreIndependentSet(currentSet.second);
-	while (currentScore > currentSet.first) {
-		// Update weight
-		pair<int, set<T> > rescoredSet = make_pair(currentScore, currentSet.second);
-		maxIndependentSetsNotReturned.erase(currentSet);
-		maxIndependentSetsNotReturned.insert(rescoredSet);
-		// Choose new set
-		currentSet = *maxIndependentSetsNotReturned.begin();
-		currentScore = scorer.scoreIndependentSet(currentSet.second);
-	}
-	// Transfer set to the list of returned sets
-	scorer.independentSetUsed(currentSet.second);
-	maxIndependentSetsReturned.insert(currentSet.second);
-	maxIndependentSetsNotReturned.erase(currentSet);
-	// Process set to create new sets
-	for (typename set<T>::iterator i = nodesGenerated.begin(); i!=nodesGenerated.end(); ++i) {
-		set<T> generatedSet = extendSetInDirectionOfNode(currentSet.second, *i);
-		maxIndependentSetFound(generatedSet);
-	}
-	while(maxIndependentSetsNotReturned.empty() && graph.hasNextNode()) {
-		// generate a new node and extend returned sets in this direction
-		T generatedNode = graph.nextNode();
-		nodesGenerated.insert(generatedNode);
-		for (typename set< set<T> >::iterator i=maxIndependentSetsReturned.begin();
-				i!=maxIndependentSetsReturned.end(); ++i) {
-			set<T> generatedSet = extendSetInDirectionOfNode(*i, generatedNode);
-			maxIndependentSetFound(generatedSet);
-		}
-	}
-	return currentSet.second;
-}
-
-/**
- * Returns all the results that were generated as part of the calculations
- * but not returned yet. Useful in case of partial enumeration when you
- * don't want to invest more time in generating more results.
- */
-template<class T>
-vector< set<T> > MaximalIndependentSetsEnumerator<T>::getGeneratedNotReturned(){
-	vector< set<T> > result;
-	for (typename set< pair<int, set<T> > >::iterator it=maxIndependentSetsNotReturned.begin();
-			it!=maxIndependentSetsNotReturned.end(); ++it) {
-		result.push_back(it->second);
-	}
-	return result;
+	return set<T>();
 }
 
 } /* namespace tdenum */

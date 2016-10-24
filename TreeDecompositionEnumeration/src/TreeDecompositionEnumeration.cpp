@@ -111,10 +111,6 @@ int main(int argc, char* argv[]) {
 		double totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
 		if (isTimeLimited && totalTimeInSeconds >= timeLimitInSeconds) {
 			timeLimitExceeded = true;
-			vector<ChordalGraph> moreResults = enumerator.getGeneratedNotReturned();
-			for (unsigned int i=0; i<moreResults.size(); i++) {
-				results.newResult(moreResults[i]);
-			}
 			break;
 		}
 	}
