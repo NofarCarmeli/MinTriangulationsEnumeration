@@ -40,11 +40,14 @@ public:
 	// Returns the number of nodes in the graph
 	int getNumberOfNodes() const;
 	// Returns the neighbors of the given node
-	NodeSet getNeighbors(Node v) const;
+	const NodeSet& getNeighbors(Node v) const;
 	// Returns the neighbors of the given node set
 	NodeSet getNeighbors(const NodeSet& s) const;
 	// Returns whether there is an edge between the given two nodes
 	bool areNeighbors(Node u, Node v) const;
+	// Returns a map from the Nodes numbers to the number of the component they are in.
+	// -1 if they are in the input set.
+	vector<int> getComponentsMap(const NodeSet& removedNodes) const;
 	// Returns the set of components obtained by removing the given node set
 	vector< set<Node> > getComponents(const NodeSet& removedNodes) const;
 	// Prints the graph

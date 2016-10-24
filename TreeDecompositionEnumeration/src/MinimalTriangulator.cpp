@@ -2,10 +2,11 @@
 #include "DataStructures.h"
 #include <map>
 #include <algorithm>
+#include <iterator>
 
 namespace tdenum {
 
-MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h) {}
+MinimalTriangulator::MinimalTriangulator(TriangulationAlgorithm h) : heuristic(h), time(0) {}
 
 // implementing MSC-M algorithm
 ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
@@ -22,8 +23,7 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 		vector<Node> nodesToUpdate;
 		vector<bool> reached(g.getNumberOfNodes(), false);
 		vector< vector<Node> > reachedByMaxWeight(g.getNumberOfNodes(), vector<Node>());
-		NodeSet neighborsOfV = g.getNeighbors(v);
-		for (NodeSetIterator i=neighborsOfV.begin(); i!=neighborsOfV.end(); ++i) {
+		for (NodeSetIterator i=g.getNeighbors(v).begin(); i!=g.getNeighbors(v).end(); ++i) {
 			Node u = *i;
 			if (!handled[u]) {
 				nodesToUpdate.push_back(u);
@@ -35,8 +35,7 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 			while (!reachedByMaxWeight[maxWeight].empty()) {
 				Node w = reachedByMaxWeight[maxWeight].back();
 				reachedByMaxWeight[maxWeight].pop_back();
-				NodeSet neighborsOfW = g.getNeighbors(w);
-				for (NodeSetIterator i=neighborsOfW.begin(); i!=neighborsOfW.end(); ++i) {
+				for (NodeSetIterator i=g.getNeighbors(w).begin(); i!=g.getNeighbors(w).end(); ++i) {
 					Node u = *i;
 					if (!handled[u] && !reached[u]) {
 						if (queue.getWeight(u) > maxWeight) {

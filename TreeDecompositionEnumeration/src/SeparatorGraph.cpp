@@ -15,22 +15,20 @@ MinimalSeparator SeparatorGraph::nextNode() {
 }
 
 // check if the nodes of v are in different components of the graph obtained by removing u
-bool SeparatorGraph::hasEdge(const MinimalSeparator& u, const MinimalSeparator& v) {
-	vector<bool> inV (graph.getNumberOfNodes(), false);
-	for (NodeSet::iterator it = v.begin(); it!=v.end(); ++it) {
-		inV[*it] = true;
-	}
-	vector<NodeSet> componentsofU = graph.getComponents(u);
-	int componentsContainingV = 0;
-	for (vector<NodeSet>::iterator i=componentsofU.begin(); i!=componentsofU.end(); ++i) {
-		for (NodeSet::iterator j = i->begin(); j != i->end(); ++j) {
-			if (inV[*j]) {
-				componentsContainingV++;
-				if (componentsContainingV > 1) {
-					return true;
-				}
-				break;
-			}
+bool SeparatorGraph::hasEdge(const MinimalSeparator& s, const MinimalSeparator& t) {
+	vector<int> componentsMap = graph.getComponentsMap(s);
+	int componentContainingT = 0;
+	for (set<Node>::iterator it = t.begin(); it != t.end(); ++it) {
+		int componentContainingCurrentNode = componentsMap[*it];
+		if (componentContainingT == componentContainingCurrentNode) {
+			continue;
+		} else if (componentContainingCurrentNode == -1) {
+			continue;
+		} else if (componentContainingT == 0) {
+			componentContainingT = componentContainingCurrentNode;
+			continue;
+		} else {
+			return true;
 		}
 	}
 	return false;

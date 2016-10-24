@@ -74,9 +74,10 @@ int Graph::getNumberOfNodes() const {
 /*
  * Returns the set of neighbors of the given node
  */
-NodeSet Graph::getNeighbors(Node v) const {
+const NodeSet& Graph::getNeighbors(Node v) const {
 	if (!isValidNode(v)) {
-		return NodeSet();
+		cout << "Error: Requesting access to invalid node" << endl;
+		return neighborSets[0];
 	}
 	return neighborSets[v];
 }
@@ -153,6 +154,47 @@ vector< set<Node> > Graph::getComponentsAux(vector<int> visitedList, int numberO
 		components.push_back(componentProducer.produce());
 	}
 	return components;
+}
+
+vector<int> Graph::getComponentsMap(const NodeSet& removedNodes) const {
+	vector<int> visitedList(numberOfNodes, 0);
+	for (NodeSetIterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
+		Node v = *i;
+		if (!isValidNode(v)) {
+			return vector<int>();
+		}
+		visitedList[v] = -1;
+	}
+	int numberOfUnhandeledNodes = numberOfNodes - removedNodes.size();
+	int currentComponent = 1;
+	while (numberOfUnhandeledNodes > 0) {
+			queue<Node> bfsQueue;
+			// Initialize the queue to contain a node not handled
+			for (Node i=0; i<numberOfNodes; i++) {
+				if (visitedList[i]==0) {
+					bfsQueue.push(i);
+					visitedList[i]=currentComponent;
+					numberOfUnhandeledNodes--;
+					break;
+				}
+			}
+			// BFS through the component
+			while (!bfsQueue.empty()) {
+				Node v = bfsQueue.front();
+				bfsQueue.pop();
+				for (NodeSetIterator i = neighborSets[v].begin();
+						i != neighborSets[v].end(); ++i) {
+					Node u = *i;
+					if (visitedList[u]==0) {
+						bfsQueue.push(u);
+						visitedList[u]=currentComponent;
+						numberOfUnhandeledNodes--;
+					}
+				}
+			}
+			currentComponent++;
+		}
+	return visitedList;
 }
 
 void Graph::print() {
