@@ -111,7 +111,7 @@ class NodeQueue {
 	int score(Node v) {
 		if (heuristic == MIN_DEGREE_LB_TRIANG || heuristic == INITIAL_DEGREE_LB_TRIANG) {
 			return graph.getNeighbors(v).size();
-		} else if (heuristic == MIN_FILL_LB_TRIANG || heuristic == INITIAL_FILL_LB_TRIANG) {
+		} else if (heuristic == MIN_FILL_LB_TRIANG || heuristic == INITIAL_FILL_LB_TRIANG || heuristic == COMBINED) {
 			return getFill(graph, v);
 		}
 		return 0;
@@ -125,7 +125,7 @@ public:
 	Node pop() {
 		Node top = queue.begin()->second;
 		// check if score was updates in relevant heuristics
-		if (heuristic == MIN_DEGREE_LB_TRIANG || heuristic == MIN_FILL_LB_TRIANG) {
+		if (heuristic == MIN_DEGREE_LB_TRIANG || heuristic == MIN_FILL_LB_TRIANG || heuristic == COMBINED) {
 			int savedScore = queue.begin()->first;
 			int currentScore = score(top);
 			while (currentScore > savedScore) {
@@ -162,7 +162,8 @@ ChordalGraph getMinimalTriangulationUsingLBTriang(const Graph& g, TriangulationA
 
 
 ChordalGraph MinimalTriangulator::triangulate(const Graph& g) {
-	if (heuristic == MCS_M) {
+	time++;
+	if (heuristic == MCS_M || (heuristic == COMBINED && time % 2 == 0)) {
 		return getMinimalTriangulationUsingMSCM(g);
 	}
 	return getMinimalTriangulationUsingLBTriang(g, heuristic);

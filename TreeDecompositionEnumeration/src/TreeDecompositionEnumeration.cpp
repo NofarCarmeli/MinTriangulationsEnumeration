@@ -50,6 +50,8 @@ int main(int argc, char* argv[]) {
 			heuristic = INITIAL_FILL_LB_TRIANG;
 		} else if (heuristicName == "lb") {
 			heuristic = LB_TRIANG;
+		} else if (heuristicName == "combined") {
+			heuristic = COMBINED;
 		} else {
 			cout << "Triangulation algorithm not recognized" << endl;
 			return 0;

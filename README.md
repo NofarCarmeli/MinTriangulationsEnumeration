@@ -28,6 +28,7 @@ Options are: mcs, degree, fill. Default is mcs.
 * initalDegree - using LB-Triang algorithm, determining the order of vertices up-front by the min-degree.
 * fill - using LB-Triang algorithm with min-fill heuristic for the order of vertices.
 * initalFill - using LB-Triang algorithm, determining the order of vertices up-front by the min-fill.
+* combined - runs msc and fill alternatively.
 
 ### triangulations_order
 The order of extending the generated minimal triangulations.
