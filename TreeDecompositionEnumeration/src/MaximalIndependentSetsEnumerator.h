@@ -67,16 +67,18 @@ public:
 template<class T>
 void MaximalIndependentSetsEnumerator<T>::getNextSetToExtend() {
 	pair<int, set<T> > currentScoredSet = *extendingQueue.begin();
-	// Support for changing scores: Maybe choose a different set if the score has changed
-	int currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
-	while (currentScore > currentScoredSet.first) {
-		// Update weight
-		pair<int, set<T> > rescoredSet = make_pair(currentScore, currentScoredSet.second);
-		extendingQueue.erase(currentScoredSet);
-		extendingQueue.insert(rescoredSet);
-		// Choose new set
-		currentScoredSet = *extendingQueue.begin();
-		currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
+	if (scorer.mayScoreChange()) {
+		// Support for changing scores: Maybe choose a different set if the score has changed
+		int currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
+		while (currentScore > currentScoredSet.first) {
+			// Update weight
+			pair<int, set<T> > rescoredSet = make_pair(currentScore, currentScoredSet.second);
+			extendingQueue.erase(currentScoredSet);
+			extendingQueue.insert(rescoredSet);
+			// Choose new set
+			currentScoredSet = *extendingQueue.begin();
+			currentScore = scorer.scoreIndependentSet(currentScoredSet.second);
+		}
 	}
 	currentSet = currentScoredSet.second;
 	// Update that this set is being extended

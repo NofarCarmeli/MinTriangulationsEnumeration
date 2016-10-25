@@ -21,6 +21,11 @@ public:
 	 */
 	virtual int scoreIndependentSet(const set<T>& s) = 0;
 	/**
+	 * Returns true if the scoring criteria is such that the scoring of the same
+	 * set may change with time.
+	 */
+	virtual bool mayScoreChange() = 0;
+	/**
 	 * Marks the given set as used. Useful is case of scoring relative to used sets.
 	 */
 	virtual void independentSetUsed(const set<T>& s) = 0;

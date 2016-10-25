@@ -40,10 +40,16 @@ int IndSetScorerByTriangulation::scoreIndependentSet(const set<MinimalSeparator>
 	return 0;
 }
 
+bool IndSetScorerByTriangulation::mayScoreChange() {
+	return (criterion == DIFFERENECE);
+}
+
 void IndSetScorerByTriangulation::independentSetUsed(const set<MinimalSeparator>& s) {
-	ChordalGraph g = Converter::minimalSeparatorsToTriangulation(graph, s);
-	vector< set<Node> > fillEdges = g.getFillEdges(graph);
-	seenFillEdges.insert(fillEdges.begin(), fillEdges.end());
+	if (criterion == DIFFERENECE) {
+		ChordalGraph g = Converter::minimalSeparatorsToTriangulation(graph, s);
+		vector< set<Node> > fillEdges = g.getFillEdges(graph);
+		seenFillEdges.insert(fillEdges.begin(), fillEdges.end());
+	}
 }
 
 } /* namespace tdenum */

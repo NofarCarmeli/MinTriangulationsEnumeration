@@ -23,6 +23,7 @@ public:
 	IndSetScorerByTriangulation(const Graph& g, TriangulationScoringCriterion c);
 	virtual ~IndSetScorerByTriangulation();
 	int scoreIndependentSet(const set<MinimalSeparator>& s);
+	bool mayScoreChange();
 	void independentSetUsed(const set<MinimalSeparator>& s);
 };
 
