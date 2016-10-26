@@ -17,6 +17,10 @@ public:
 	 * assumed to start from zero. All values are separated by spaces.
 	 * 4. CSV files. Each line containing names of nodes in a clique, seperated
 	 * by commas.
+	 * 5. bliss files. May begin with comments, lines starting with "c".
+	 * Then starts with a line "p edge <number-of-nodes> <number-of-edges>".
+	 * Other lines specify edges "e <node> <another-node>".
+	 * Where all nodes are numbers between 1 and <number-of-nodes>.
 	 */
 	static Graph read(const string& fileName);
 };

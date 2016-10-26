@@ -11,7 +11,7 @@ Specify input file and configuration using command line arguments:
 Only the input file is required.
 
 ### input_file
-Supported file formats are: hg, sp, wcnf, uai, csv.
+Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
 * csv - each line holds name of variables in a clique.
 
 ### time_limit

@@ -142,6 +142,36 @@ Graph readCSV(ifstream& input) {
 	return g;
 }
 
+Graph readBliss(ifstream& input) {
+	string line;
+	getline(input, line);
+	// Skip comments
+	while (line[0] == 'c') {
+		getline(input, line);
+	}
+
+	istringstream lineStream(line);
+	// Skip beginning of line ("p edge "), and get numbers of nodes and edges.
+	while (lineStream.peek() > '9' || lineStream.peek() < '0') {
+		lineStream.get();
+	}
+	int numberOfNodes, numberOfEdges;
+	lineStream >> numberOfNodes >> numberOfEdges;
+	// Get clauses and create graph
+	Graph g(numberOfNodes);
+	for (int i=0; i<numberOfEdges; i++) {
+		getline(input, line);
+		istringstream lineStream(line);
+		while (lineStream.peek() > '9' || lineStream.peek() < '0') {
+			lineStream.get();
+		}
+		int firstNodes, secondNode;
+		lineStream >> firstNodes >> secondNode;
+		g.addEdge(firstNodes-1, secondNode-1);
+	}
+	return g;
+}
+
 string GetFileExtension(const string& fileName) {
     if(fileName.find_last_of(".") != string::npos)
         return fileName.substr(fileName.find_last_of(".")+1);
@@ -163,6 +193,8 @@ Graph GraphReader::read(const string& fileName) {
 		return readUAI(input);
 	} else if ( extension == "csv" ) {
 		return readCSV(input);
+	} else if ( extension == "bliss") {
+		return readBliss(input);
 	}
 	cout << "Unrecognized file extension" << endl;
 	return Graph();

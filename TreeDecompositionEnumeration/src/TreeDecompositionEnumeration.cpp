@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 	cout << setprecision(2);
 	cout << "Starting enumeration for "  << inputFileName << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, output, true);
+	ResultsHandler results(g, output, false);
 	bool timeLimitExceeded = false;
 
 	// generate and print the results to output file
