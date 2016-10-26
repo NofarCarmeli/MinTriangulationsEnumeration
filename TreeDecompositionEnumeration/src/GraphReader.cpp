@@ -165,9 +165,12 @@ Graph readBliss(ifstream& input) {
 		while (lineStream.peek() > '9' || lineStream.peek() < '0') {
 			lineStream.get();
 		}
-		int firstNodes, secondNode;
-		lineStream >> firstNodes >> secondNode;
-		g.addEdge(firstNodes-1, secondNode-1);
+		NodeSet clique;
+		Node v;
+		while(lineStream >> v) {
+			clique.insert(v-1);
+		}
+		g.addClique(clique);
 	}
 	return g;
 }
