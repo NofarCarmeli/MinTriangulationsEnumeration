@@ -118,9 +118,9 @@ int main(int argc, char* argv[]) {
 
 	// Output summary to standard output
 	if (timeLimitExceeded) {
-		cout << "Time limit reached, ";
+		cout << "Time limit reached." << endl;
 	} else {
-		cout << "All minimal triangulations were generated! ";
+		cout << "All minimal triangulations were generated!" << endl;
 	}
 	results.printSummary(cout);
 

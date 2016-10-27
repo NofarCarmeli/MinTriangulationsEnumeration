@@ -49,32 +49,45 @@ class ResultsHandler {
 	ResultInformation firstResult;
 	ResultInformation minWidthResult;
 	ResultInformation minFillResult;
+	int minWidth, maxWidth;
+	int minFill, maxFill;
 	int resultsFound;
 	double getTime() {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
 	}
 public:
 	ResultsHandler(const Graph& g, ostream& o, bool onlyPrintImprovements) :
-				graph(g), output(o), onlyPrintImprovements(onlyPrintImprovements), resultsFound(0) {
+				graph(g), output(o), onlyPrintImprovements(onlyPrintImprovements),
+				minWidth(0), maxWidth(0), minFill(0), maxFill(0), resultsFound(0) {
 		startTime = clock();
 	}
 	void newResult(const ChordalGraph& triangulation) {
 		ResultInformation currentResult(++resultsFound, getTime(), graph, triangulation);
 		bool print = false;
+		int width = currentResult.getWidth();
+		int fill = currentResult.getFill();
 		if (resultsFound == 1) {
 			firstResult = currentResult;
 			minWidthResult = currentResult;
 			minFillResult = currentResult;
+			minWidth = maxWidth = width;
+			minFill = maxFill = fill;
 			ResultInformation::printCsvHeaderByTime(output);
 			print = true;
 		} else {
-			if (currentResult.getWidth() < minWidthResult.getWidth()) {
+			if (width < minWidth) {
 				minWidthResult = currentResult;
+				minWidth = width;
 				print = true;
+			} else if (width > maxWidth) {
+				maxWidth = width;
 			}
-			if (currentResult.getFill() < minFillResult.getFill()) {
+			if (fill < minFill) {
 				minFillResult = currentResult;
+				minFill = fill;
 				print = true;
+			} else if (fill > maxFill) {
+				maxFill = fill;
 			}
 		}
 		if (!onlyPrintImprovements) {
@@ -86,13 +99,25 @@ public:
 	}
 	void printSummary(ostream& output) {
 		output << resultsFound << " results found, ";
-		output << "Total time " << getTime() << " seconds." << endl;
-		output << "First result: ";
-		firstResult.printDetails(output);
-		output << "Lowest fill: ";
-		minFillResult.printDetails(output);
-		output << "Lowest width: ";
-		minWidthResult.printDetails(output);
+		if (minWidth == maxWidth) {
+			output << "width " << minWidth << ", ";
+		} else {
+			output << "width " << minWidth << "-" << maxWidth << ", ";
+		}
+		if (minFill == maxFill) {
+			output << "fill " << minFill << ", ";
+		} else {
+			output << "fill " << minFill << "-" << maxFill << ", ";
+		}
+		output << "total time " << getTime() << " seconds." << endl;
+		if (resultsFound > 1) {
+			output << "First result: ";
+			firstResult.printDetails(output);
+			output << "Lowest fill: ";
+			minFillResult.printDetails(output);
+			output << "Lowest width: ";
+			minWidthResult.printDetails(output);
+		}
 	}
 };
 
