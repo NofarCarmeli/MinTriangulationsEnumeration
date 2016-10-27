@@ -82,6 +82,14 @@ const NodeSet& Graph::getNeighbors(Node v) const {
 	return neighborSets[v];
 }
 
+vector<bool> Graph::getNeighborsMap(Node v) const {
+	vector<bool> result(numberOfNodes, false);
+	for (NodeSet::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
+		result[*j] = true;
+	}
+	return result;
+}
+
 /*
  * Returns the set of neighbors of nodes in the given node set without returning
  * nodes that are in the input node set

@@ -41,7 +41,10 @@ public:
 	int getNumberOfNodes() const;
 	// Returns the neighbors of the given node
 	const NodeSet& getNeighbors(Node v) const;
-	// Returns the neighbors of the given node set
+	// Returns a vector the size of the number of nodes in the graph, stating
+	// whether the index nodes are neighbors of the input node.
+	vector<bool> getNeighborsMap(Node v) const;
+		// Returns the neighbors of the given node set
 	NodeSet getNeighbors(const NodeSet& s) const;
 	// Returns whether there is an edge between the given two nodes
 	bool areNeighbors(Node u, Node v) const;

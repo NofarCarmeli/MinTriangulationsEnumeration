@@ -63,12 +63,17 @@ int getFill(const Graph& g, Node v) {
 	int twiceFillEdges = 0;
 	// for every node in the neighborhood, add the number of non-neighbors
 	for (set<Node>::iterator it=neighborsSet.begin(); it!=neighborsSet.end(); ++it) {
+		vector<bool> notNeighborsOfCurrentNode = g.getNeighborsMap(v);
+		notNeighborsOfCurrentNode[*it] = false;
 		const set<Node>& neighborsOfCurrentNode = g.getNeighbors(*it);
-		set<Node> notNeighborsOfCurrentNode;
-		set_difference(neighborsSet.begin(), neighborsSet.end(),
-				neighborsOfCurrentNode.begin(), neighborsOfCurrentNode.end(),
-				inserter(notNeighborsOfCurrentNode, notNeighborsOfCurrentNode.begin()));
-		twiceFillEdges+= (notNeighborsOfCurrentNode.size()-1);
+		for (set<Node>::iterator jt=neighborsOfCurrentNode.begin(); jt!=neighborsOfCurrentNode.end(); ++jt) {
+			notNeighborsOfCurrentNode[*jt] = false;
+		}
+		for (int i=0; i<g.getNumberOfNodes(); i++) {
+			if (notNeighborsOfCurrentNode[i]) {
+				twiceFillEdges++;
+			}
+		}
 	}
 	return twiceFillEdges/2;
 }
