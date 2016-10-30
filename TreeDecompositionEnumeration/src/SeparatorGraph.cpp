@@ -18,7 +18,7 @@ MinimalSeparator SeparatorGraph::nextNode() {
 bool SeparatorGraph::hasEdge(const MinimalSeparator& s, const MinimalSeparator& t) {
 	vector<int> componentsMap = graph.getComponentsMap(s);
 	int componentContainingT = 0;
-	for (set<Node>::iterator it = t.begin(); it != t.end(); ++it) {
+	for (MinimalSeparator::const_iterator it = t.begin(); it != t.end(); ++it) {
 		int componentContainingCurrentNode = componentsMap[*it];
 		if (componentContainingT == componentContainingCurrentNode) {
 			continue;

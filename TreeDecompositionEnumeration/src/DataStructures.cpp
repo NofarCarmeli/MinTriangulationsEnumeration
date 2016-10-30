@@ -45,27 +45,27 @@ bool WeightedNodeSetQueue::isEmpty() {
 	return queue.empty();
 }
 
-bool WeightedNodeSetQueue::isMember(const set<Node>& nodeSet, int weight) {
+bool WeightedNodeSetQueue::isMember(const vector<Node>& nodeSet, int weight) {
 	return queue.find(make_pair(weight, nodeSet)) != queue.end();
 }
 
-void WeightedNodeSetQueue::insert(const set<Node>& nodeSet, int weight) {
+void WeightedNodeSetQueue::insert(const vector<Node>& nodeSet, int weight) {
 	queue.insert(make_pair(weight, nodeSet));
 }
 
-set<Node> WeightedNodeSetQueue::pop() {
-	set<Node> nodeSet = queue.begin()->second;
+vector<Node> WeightedNodeSetQueue::pop() {
+	vector<Node> nodeSet = queue.begin()->second;
 	queue.erase(queue.begin());
 	return nodeSet;
 }
 
 
 
-bool NodeSetSet::isMember(const set<Node>& nodeSet) {
+bool NodeSetSet::isMember(const vector<Node>& nodeSet) {
 	return sets.find(nodeSet) != sets.end();
 }
 
-void NodeSetSet::insert(const set<Node>& nodeSet) {
+void NodeSetSet::insert(const vector<Node>& nodeSet) {
 	sets.insert(nodeSet);
 }
 
@@ -82,14 +82,14 @@ void NodeSetProducer::remove(Node v) {
 	isMember[v] = false;
 }
 
-set<Node> NodeSetProducer::produce() {
-	vector<Node> members;
+NodeSet NodeSetProducer::produce() {
+	NodeSet members;
 	for (unsigned int i=0; i<isMember.size(); i++) {
 		if (isMember[i]) {
 			members.push_back(i);
 		}
 	}
-	return set<Node> (members.begin(), members.end());
+	return members;
 }
 
 } /* namespace tdenum */

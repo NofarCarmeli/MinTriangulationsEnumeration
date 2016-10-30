@@ -41,25 +41,25 @@ public:
  * A minimum heap.
  */
 class WeightedNodeSetQueue {
-	set< pair<int, set<Node> > > queue;
+	set< pair<int, NodeSet > > queue;
 public:
 	// True if the structure is empty.
 	bool isEmpty();
 	// True if the structure contains the given node set with the given weight.
-	bool isMember(const set<Node>& nodeSet, int weight);
+	bool isMember(const NodeSet& nodeSet, int weight);
 	// Adds the given node set to the structure with the given weight.
-	void insert(const set<Node>& nodeSet, int weight);
+	void insert(const NodeSet& nodeSet, int weight);
 	// Returns the maximal weighted node set, and removes it from the structure.
-	set<Node> pop();
+	NodeSet pop();
 };
 
 class NodeSetSet {
-	set< set<Node> > sets;
+	set< NodeSet > sets;
 public:
     // True if the structure contains the given node set.
-	bool isMember(const set<Node>& nodeSet);
+	bool isMember(const NodeSet& nodeSet);
 	// Adds the given node set to the structure.
-	void insert(const set<Node>& nodeSet);
+	void insert(const NodeSet& nodeSet);
 };
 
 
@@ -76,8 +76,8 @@ public:
 	// Removes the given node from the subset.
 	// Node is assumed to be an integer between 0 and sizeOfOriginalNodeSet-1.
 	void remove(Node v);
-	// Returns the subset containing all added nodes.
-	set<Node> produce();
+	// Returns the subset containing all added nodes, sorted ascending.
+	NodeSet produce();
 };
 
 } /* namespace tdenum */

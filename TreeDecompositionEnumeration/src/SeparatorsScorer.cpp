@@ -14,8 +14,8 @@ int SeparatorsScorer::scoreSeparator(const MinimalSeparator& s) {
 		return s.size();
 	} else if (criterion == FILL_EDGES) {
 		int fill_edges = 0;
-		for (MinimalSeparator::iterator it=s.begin(); it!=s.end(); ++it) {
-			for (MinimalSeparator::iterator jt=s.begin(); jt!=it; ++jt) {
+		for (MinimalSeparator::const_iterator it=s.begin(); it!=s.end(); ++it) {
+			for (MinimalSeparator::const_iterator jt=s.begin(); jt!=it; ++jt) {
 				if (!graph.areNeighbors(*it, *jt)) {
 					fill_edges++;
 				}

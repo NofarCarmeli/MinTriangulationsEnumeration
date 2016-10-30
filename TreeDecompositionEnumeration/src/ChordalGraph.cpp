@@ -50,7 +50,7 @@ set<NodeSet> ChordalGraph::getMaximalCliques() const {
 			// add currentNode and  its visited neighbors to cliques
 			NodeSetProducer cliqueProducer(getNumberOfNodes());
 			cliqueProducer.insert(previousNode);
-			for (NodeSetIterator i = getNeighbors(previousNode).begin();
+			for (set<Node>::iterator i = getNeighbors(previousNode).begin();
 					i!=getNeighbors(previousNode).end(); ++i) {
 				if (isVisited[*i]) {
 					cliqueProducer.insert(*i);
@@ -59,7 +59,7 @@ set<NodeSet> ChordalGraph::getMaximalCliques() const {
 			cliques.insert(cliqueProducer.produce());
 		}
 		// Update structures
-		for (NodeSetIterator i = getNeighbors(currentNode).begin();
+		for (set<Node>::iterator i = getNeighbors(currentNode).begin();
 				i!=getNeighbors(currentNode).end(); ++i) {
 			if (!isVisited[*i]) {
 				queue.increaseWeight(*i);
@@ -72,7 +72,7 @@ set<NodeSet> ChordalGraph::getMaximalCliques() const {
 	// add the last clique
 	NodeSetProducer cliqueProducer(getNumberOfNodes());
 	cliqueProducer.insert(previousNode);
-	for (NodeSetIterator i = getNeighbors(previousNode).begin();
+	for (set<Node>::iterator i = getNeighbors(previousNode).begin();
 			i!=getNeighbors(previousNode).end(); ++i) {
 		cliqueProducer.insert(*i);
 	}
@@ -94,7 +94,7 @@ int ChordalGraph::getTreeWidth() const {
 vector< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
 	vector< set<Node> > edges;
 	for (Node v=0; v<getNumberOfNodes(); v++) {
-		for (NodeSetIterator j=getNeighbors(v).begin(); j!=getNeighbors(v).end(); ++j) {
+		for (set<Node>::iterator j=getNeighbors(v).begin(); j!=getNeighbors(v).end(); ++j) {
 			Node u = *j;
 			if (v <= u && !origin.areNeighbors(v,u)) {
 				set<Node> edge;

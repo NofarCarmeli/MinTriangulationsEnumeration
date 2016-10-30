@@ -9,7 +9,7 @@ MinimalSeparatorsEnumerator::MinimalSeparatorsEnumerator(const Graph& g, Separat
 	graph(g), scorer(g,c) {
 	// Initialize separatorsNotReturned according to the initialization phase
 	for (Node v = 0; v < g.getNumberOfNodes(); v++) {
-		NodeSet vAndNeighbors = graph.getNeighbors(v);
+		set<Node> vAndNeighbors = graph.getNeighbors(v);
 		vAndNeighbors.insert(v);
 		vector<NodeSet> components = graph.getComponents(vAndNeighbors);
 		for (vector<NodeSet>::iterator it=components.begin(); it!=components.end(); ++it) {
@@ -54,9 +54,9 @@ MinimalSeparator MinimalSeparatorsEnumerator::next() {
 	MinimalSeparator s = separatorsToExtend.pop();
 	separatorsExtended.insert(s);
 	// Process separator according to the generation phase
-	for (NodeSetIterator i = s.begin(); i != s.end(); ++i) {
+	for (MinimalSeparator::iterator i = s.begin(); i != s.end(); ++i) {
 		Node x = *i;
-		NodeSet xNeighborsAndS = graph.getNeighbors(x);
+		set<Node> xNeighborsAndS = graph.getNeighbors(x);
 		xNeighborsAndS.insert(s.begin(),s.end());
 		vector<NodeSet> components = graph.getComponents(xNeighborsAndS);
 		for (vector<NodeSet>::iterator j = components.begin(); j != components.end(); ++j) {

@@ -20,10 +20,10 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 		Node v = queue.pop();
 		handled[v] = true;
 		// Find nodes to update
-		vector<Node> nodesToUpdate;
+		NodeSet nodesToUpdate;
 		vector<bool> reached(g.getNumberOfNodes(), false);
-		vector< vector<Node> > reachedByMaxWeight(g.getNumberOfNodes(), vector<Node>());
-		for (NodeSetIterator i=g.getNeighbors(v).begin(); i!=g.getNeighbors(v).end(); ++i) {
+		vector<NodeSet> reachedByMaxWeight(g.getNumberOfNodes(), vector<Node>());
+		for (set<Node>::iterator i=g.getNeighbors(v).begin(); i!=g.getNeighbors(v).end(); ++i) {
 			Node u = *i;
 			if (!handled[u]) {
 				nodesToUpdate.push_back(u);
@@ -35,7 +35,7 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 			while (!reachedByMaxWeight[maxWeight].empty()) {
 				Node w = reachedByMaxWeight[maxWeight].back();
 				reachedByMaxWeight[maxWeight].pop_back();
-				for (NodeSetIterator i=g.getNeighbors(w).begin(); i!=g.getNeighbors(w).end(); ++i) {
+				for (set<Node>::iterator i=g.getNeighbors(w).begin(); i!=g.getNeighbors(w).end(); ++i) {
 					Node u = *i;
 					if (!handled[u] && !reached[u]) {
 						if (queue.getWeight(u) > maxWeight) {
@@ -48,7 +48,7 @@ ChordalGraph getMinimalTriangulationUsingMSCM(const Graph& g) {
 			}
 		}
 		// Update nodes
-		for (vector<Node>::iterator j=nodesToUpdate.begin(); j!=nodesToUpdate.end(); ++j) {
+		for (NodeSet::iterator j=nodesToUpdate.begin(); j!=nodesToUpdate.end(); ++j) {
 			Node u = *j;
 			queue.increaseWeight(u);
 			triangulation.addEdge(u, v);
@@ -79,9 +79,9 @@ int getFill(const Graph& g, Node v) {
 }
 
 class NodeSetStaturator {
-	set< set<Node> > toSaturate;
+	set<NodeSet> toSaturate;
 public:
-	void markForSaturation(const set<Node>& nodeSet) {
+	void markForSaturation(const vector<Node>& nodeSet) {
 		toSaturate.insert(nodeSet);
 	}
 	void saturate(Graph& g) {
@@ -91,11 +91,11 @@ public:
 
 // Returns the minimal separators included in the neighborhood of v
 NodeSetStaturator getSubstars(const Graph& g, const Graph& gi, Node v) {
-	NodeSet removedNodes = gi.getNeighbors(v);
+	set<Node> removedNodes = gi.getNeighbors(v);
 	removedNodes.insert(v);
-	vector< set<Node> > components = g.getComponents(removedNodes);
+	vector<NodeSet> components = g.getComponents(removedNodes);
 	NodeSetStaturator saturator;
-	for (vector< set<Node> >::iterator it=components.begin(); it!=components.end(); ++it) {
+	for (vector<NodeSet>::iterator it=components.begin(); it!=components.end(); ++it) {
 		saturator.markForSaturation(g.getNeighbors(*it));
 	}
 	return saturator;

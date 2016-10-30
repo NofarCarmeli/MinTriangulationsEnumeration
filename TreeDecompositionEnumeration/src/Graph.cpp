@@ -10,10 +10,22 @@ Graph::Graph() : numberOfNodes(0), numberOfEdges(0) {}
 Graph::Graph(int numberOfNodes) : numberOfNodes(numberOfNodes), numberOfEdges(0),
 		neighborSets(numberOfNodes) {}
 
-void Graph::addClique(const NodeSet& newClique) {
-	for (NodeSetIterator i = newClique.begin(); i != newClique.end(); ++i) {
+void Graph::addClique(const set<Node>& newClique) {
+	for (set<Node>::iterator i = newClique.begin(); i != newClique.end(); ++i) {
 		Node v = *i;
-		for (NodeSetIterator j = newClique.begin(); j != newClique.end(); ++j) {
+		for (set<Node>::iterator j = newClique.begin(); j != newClique.end(); ++j) {
+			Node u = *j;
+			if (u < v) {
+				addEdge(u, v);
+			}
+		}
+	}
+}
+
+void Graph::addClique(const vector<Node>& newClique) {
+	for (vector<Node>::const_iterator i = newClique.begin(); i != newClique.end(); ++i) {
+		Node v = *i;
+		for (vector<Node>::const_iterator j = newClique.begin(); j != newClique.end(); ++j) {
 			Node u = *j;
 			if (u < v) {
 				addEdge(u, v);
@@ -31,8 +43,15 @@ void Graph::addEdge(Node u, Node v) {
 	numberOfEdges++;
 }
 
-void Graph::saturateNodeSets(const set<NodeSet>& s) {
-	for (set<NodeSet>::iterator i = s.begin(); i != s.end(); ++i) {
+void Graph::saturateNodeSets(const set< set<Node> >& s) {
+	for (set< set<Node> >::iterator i = s.begin(); i != s.end(); ++i) {
+		addClique(*i);
+	}
+}
+
+// Adds edges that will make the given node sets cliques
+void Graph::saturateNodeSets(const set< vector<Node> >& s) {
+	for (set< vector<Node> >::iterator i = s.begin(); i != s.end(); ++i) {
 		addClique(*i);
 	}
 }
@@ -49,8 +68,8 @@ bool Graph::isValidNode(Node v) const {
 /*
  * Returns the set of nodes in the graph
  */
-NodeSet Graph::getNodes() const {
-	NodeSet nodes;
+set<Node> Graph::getNodes() const {
+	set<Node> nodes;
 	for (Node i=0; i<numberOfNodes; i++) {
 		nodes.insert(i);
 	}
@@ -74,7 +93,7 @@ int Graph::getNumberOfNodes() const {
 /*
  * Returns the set of neighbors of the given node
  */
-const NodeSet& Graph::getNeighbors(Node v) const {
+const set<Node>& Graph::getNeighbors(Node v) const {
 	if (!isValidNode(v)) {
 		cout << "Error: Requesting access to invalid node" << endl;
 		return neighborSets[0];
@@ -84,7 +103,7 @@ const NodeSet& Graph::getNeighbors(Node v) const {
 
 vector<bool> Graph::getNeighborsMap(Node v) const {
 	vector<bool> result(numberOfNodes, false);
-	for (NodeSet::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
+	for (set<Node>::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
 		result[*j] = true;
 	}
 	return result;
@@ -94,14 +113,14 @@ vector<bool> Graph::getNeighborsMap(Node v) const {
  * Returns the set of neighbors of nodes in the given node set without returning
  * nodes that are in the input node set
  */
-NodeSet Graph::getNeighbors(const NodeSet& inputSet) const {
+NodeSet Graph::getNeighbors(const set<Node>& inputSet) const {
 	NodeSetProducer neighborsProducer(numberOfNodes);
 	for (set<Node>::const_iterator i = inputSet.begin(); i != inputSet.end(); ++i) {
 		Node v = *i;
 		if (!isValidNode(v)) {
-			return set<Node>();
+			return NodeSet();
 		}
-		for (NodeSet::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
+		for (set<Node>::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
 			neighborsProducer.insert(*j);
 		}
 	}
@@ -111,16 +130,33 @@ NodeSet Graph::getNeighbors(const NodeSet& inputSet) const {
 	return neighborsProducer.produce();
 }
 
+NodeSet Graph::getNeighbors(const vector<Node>& inputSet) const {
+	NodeSetProducer neighborsProducer(numberOfNodes);
+	for (vector<Node>::const_iterator i = inputSet.begin(); i != inputSet.end(); ++i) {
+		Node v = *i;
+		if (!isValidNode(v)) {
+			return NodeSet();
+		}
+		for (set<Node>::iterator j = neighborSets[v].begin(); j != neighborSets[v].end(); ++j) {
+			neighborsProducer.insert(*j);
+		}
+	}
+	for (vector<Node>::const_iterator i = inputSet.begin(); i != inputSet.end(); ++i) {
+		neighborsProducer.remove(*i);
+	}
+	return neighborsProducer.produce();
+}
+
 bool Graph::areNeighbors(Node u, Node v) const {
 	return neighborSets[u].find(v) != neighborSets[u].end();
 }
 
-vector< set<Node> > Graph::getComponents(const NodeSet& removedNodes) const {
+vector<NodeSet> Graph::getComponents(const set<Node>& removedNodes) const {
 	vector<int> visitedList(numberOfNodes, 0);
-	for (NodeSetIterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
+	for (set<Node>::iterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
 		Node v = *i;
 		if (!isValidNode(v)) {
-			return vector< set<Node> >();
+			return vector<NodeSet>();
 		}
 		visitedList[v] = -1;
 	}
@@ -128,8 +164,8 @@ vector< set<Node> > Graph::getComponents(const NodeSet& removedNodes) const {
 	return getComponentsAux(visitedList, numberOfUnhandeledNodes);
 }
 
-vector< set<Node> > Graph::getComponentsAux(vector<int> visitedList, int numberOfUnhandeledNodes) const {
-	vector< set<Node> > components;
+vector<NodeSet> Graph::getComponentsAux(vector<int> visitedList, int numberOfUnhandeledNodes) const {
+	vector<NodeSet> components;
 	// Finds a new component in each iteration
 	while (numberOfUnhandeledNodes > 0) {
 		queue<Node> bfsQueue;
@@ -148,7 +184,7 @@ vector< set<Node> > Graph::getComponentsAux(vector<int> visitedList, int numberO
 		while (!bfsQueue.empty()) {
 			Node v = bfsQueue.front();
 			bfsQueue.pop();
-			for (NodeSetIterator i = neighborSets[v].begin();
+			for (set<Node>::iterator i = neighborSets[v].begin();
 					i != neighborSets[v].end(); ++i) {
 				Node u = *i;
 				if (visitedList[u]==0) {
@@ -164,9 +200,9 @@ vector< set<Node> > Graph::getComponentsAux(vector<int> visitedList, int numberO
 	return components;
 }
 
-vector<int> Graph::getComponentsMap(const NodeSet& removedNodes) const {
+vector<int> Graph::getComponentsMap(const vector<Node>& removedNodes) const {
 	vector<int> visitedList(numberOfNodes, 0);
-	for (NodeSetIterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
+	for (vector<Node>::const_iterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
 		Node v = *i;
 		if (!isValidNode(v)) {
 			return vector<int>();
@@ -190,7 +226,7 @@ vector<int> Graph::getComponentsMap(const NodeSet& removedNodes) const {
 			while (!bfsQueue.empty()) {
 				Node v = bfsQueue.front();
 				bfsQueue.pop();
-				for (NodeSetIterator i = neighborSets[v].begin();
+				for (set<Node>::iterator i = neighborSets[v].begin();
 						i != neighborSets[v].end(); ++i) {
 					Node u = *i;
 					if (visitedList[u]==0) {
@@ -208,7 +244,7 @@ vector<int> Graph::getComponentsMap(const NodeSet& removedNodes) const {
 void Graph::print() {
 	for (Node v=0; v<getNumberOfNodes(); v++) {
 		cout << v << " has neighbors: {";
-		for (NodeSetIterator jt = getNeighbors(v).begin(); jt!=getNeighbors(v).end(); ++jt) {
+		for (set<Node>::iterator jt = getNeighbors(v).begin(); jt!=getNeighbors(v).end(); ++jt) {
 			cout << *jt << " ";
 		}
 		cout << "}" << endl;

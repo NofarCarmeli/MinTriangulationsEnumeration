@@ -24,10 +24,10 @@ Graph readCliques(ifstream& input) {
 		istringstream lineStream(line);
 		int nodesInClique;
 		lineStream >> nodesInClique;
-		NodeSet clique;
+		vector<Node> clique;
 		Node v;
 		while(lineStream >> v) {
-			clique.insert(v);
+			clique.push_back(v);
 		}
 		g.addClique(clique);
 	}
@@ -67,12 +67,12 @@ Graph readCnf(ifstream& input) {
 			int weight;
 			lineStream >> weight;
 		}
-		NodeSet clique;
+		vector<Node> clique;
 		Node v;
 		while(lineStream >> v && v!=0) {
 			v = v>0 ? v : -v;
 			v = v == numberOfNodes ? 0 : v;
-			clique.insert(v);
+			clique.push_back(v);
 		}
 		g.addClique(clique);
 	}
@@ -102,10 +102,10 @@ Graph readUAI(ifstream& input) {
 		istringstream lineStream(line);
 		int nodesInClique;
 		lineStream >> nodesInClique;
-		NodeSet clique;
+		vector<Node> clique;
 		Node v;
 		while(lineStream >> v) {
-			clique.insert(v);
+			clique.push_back(v);
 		}
 		g.addClique(clique);
 	}
@@ -114,13 +114,13 @@ Graph readUAI(ifstream& input) {
 
 Graph readCSV(ifstream& input) {
 	map <string,int> nodeNames;
-	vector < set<int> > edges;
+	vector < vector<int> > edges;
 	// Get nodes and edges
 	string line;
 	while (getline(input, line)) {
 		istringstream lineStream(line);
 		string nodeName;
-		set<int> edge;
+		vector<int> edge;
 		while (getline(lineStream, nodeName, ',' )) {
 			map<string,int>::iterator nameSearchResult = nodeNames.find(nodeName);
 			int nodeNumber;
@@ -130,7 +130,7 @@ Graph readCSV(ifstream& input) {
 			} else {
 				nodeNumber = nameSearchResult->second;
 			}
-			edge.insert(nodeNumber);
+			edge.push_back(nodeNumber);
 		}
 		edges.push_back(edge);
 	}
@@ -165,10 +165,10 @@ Graph readBliss(ifstream& input) {
 		while (lineStream.peek() > '9' || lineStream.peek() < '0') {
 			lineStream.get();
 		}
-		NodeSet clique;
+		vector<Node> clique;
 		Node v;
 		while(lineStream >> v) {
-			clique.insert(v-1);
+			clique.push_back(v-1);
 		}
 		g.addClique(clique);
 	}
