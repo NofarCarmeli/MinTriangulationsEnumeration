@@ -79,6 +79,8 @@ int getFill(const Graph& g, Node v) {
 }
 
 // Returns the minimal separators included in the neighborhood of v
+// The substars are saved in a data structure (set<NodeSet>) different than the
+// one described in the paper. Its theoretical complexity can be improved.
 set<NodeSet> getSubstars(const Graph& g, const Graph& gi, Node v) {
 	set<Node> removedNodes = gi.getNeighbors(v);
 	removedNodes.insert(v);
