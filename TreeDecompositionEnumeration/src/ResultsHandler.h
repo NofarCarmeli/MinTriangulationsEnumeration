@@ -32,8 +32,9 @@ public:
 	int getWidth() { return width; }
 	long long getExpBagSize() { return expBagSize; }
 	void printDetails(ostream& output) {
-		output << "Result number " << number << ", Time " << time << " seconds, Width "
-				<< width << ", Fill " << fill << ", Exponential Bag Size " << expBagSize << endl;
+		output << "Result number " << number << ", Time " << time
+				<< " seconds, Width " << width << ", Fill " << fill
+				<< ", Exponential Bag Size " << expBagSize << "." << endl;
 	}
 	void printCsvByTime(ostream& output) {
 		output << time << ", "
@@ -56,6 +57,7 @@ class ResultsHandler {
 	int minWidth, maxWidth;
 	int minFill, maxFill;
 	long long minBagExpSize, maxBagExpSize;
+	int resultsWithMinWidthCount;
 	int resultsFound;
 	double getTime() {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
@@ -64,7 +66,8 @@ public:
 	ResultsHandler(const Graph& g, ostream& o, bool onlyPrintImprovements) :
 				graph(g), output(o), onlyPrintImprovements(onlyPrintImprovements),
 				minWidth(0), maxWidth(0), minFill(0), maxFill(0),
-				minBagExpSize(0), maxBagExpSize(0), resultsFound(0) {
+				minBagExpSize(0), maxBagExpSize(0),
+				resultsWithMinWidthCount(0), resultsFound(0) {
 		startTime = clock();
 	}
 	void newResult(const ChordalGraph& triangulation) {
@@ -81,13 +84,17 @@ public:
 			minWidth = maxWidth = width;
 			minFill = maxFill = fill;
 			minBagExpSize = maxBagExpSize = bagExpSize;
+			resultsWithMinWidthCount = 1;
 			ResultInformation::printCsvHeaderByTime(output);
 			print = true;
 		} else {
 			if (width < minWidth) {
 				minWidthResult = currentResult;
 				minWidth = width;
+				resultsWithMinWidthCount = 1;
 				print = true;
+			} else if (width == minWidth) {
+				resultsWithMinWidthCount ++;
 			} else if (width > maxWidth) {
 				maxWidth = width;
 			}
@@ -115,6 +122,8 @@ public:
 	}
 	void printSummary(ostream& output) {
 		output << resultsFound << " results found, ";
+		output << "total time " << getTime() << " seconds." << endl;
+		output << resultsWithMinWidthCount << " results with minimal width, ";
 		if (minWidth == maxWidth) {
 			output << "width " << minWidth << ", ";
 		} else {
@@ -126,12 +135,12 @@ public:
 			output << "fill " << minFill << "-" << maxFill << ", ";
 		}
 		if (minBagExpSize == maxBagExpSize) {
-			output << "exponential bags size " << minBagExpSize << ", ";
+			output << "exponential bags size " << minBagExpSize << ".";
 		} else {
 			output << "exponential bags size " << minBagExpSize
-					<< "-" << maxBagExpSize << ", ";
+					<< "-" << maxBagExpSize << ".";
 		}
-		output << "total time " << getTime() << " seconds." << endl;
+		output <<endl;
 		if (resultsFound > 1) {
 			output << "First result: ";
 			firstResult.printDetails(output);
