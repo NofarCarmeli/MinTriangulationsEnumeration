@@ -8,6 +8,7 @@
 #include "ChordalGraph.h"
 #include "DataStructures.h"
 #include <map>
+#include <cmath>
 
 namespace tdenum {
 
@@ -16,10 +17,6 @@ ChordalGraph::ChordalGraph() {}
 ChordalGraph::ChordalGraph(const Graph& g) : Graph(g) {}
 
 ChordalGraph::~ChordalGraph() {}
-
-int ChordalGraph::getFillIn(const Graph& origin) const {
-	return getNumberOfEdges() - origin.getNumberOfEdges();
-}
 
 /*
  * Input: a chordal graph
@@ -80,17 +77,6 @@ set<NodeSet> ChordalGraph::getMaximalCliques() const {
 	return cliques;
 }
 
-int ChordalGraph::getTreeWidth() const {
-	set<NodeSet> maximalCliques = getMaximalCliques();
-	int maxSize = 0;
-	for (set<NodeSet>::iterator i=maximalCliques.begin(); i!=maximalCliques.end(); ++i) {
-		if (maxSize < (int)(*i).size()) {
-			maxSize = (*i).size();
-		}
-	}
-	return maxSize - 1;
-}
-
 vector< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
 	vector< set<Node> > edges;
 	for (Node v=0; v<getNumberOfNodes(); v++) {
@@ -106,6 +92,31 @@ vector< set<Node> > ChordalGraph::getFillEdges(const Graph& origin) const {
 	}
 	return edges;
 }
+
+int ChordalGraph::getFillIn(const Graph& origin) const {
+	return getNumberOfEdges() - origin.getNumberOfEdges();
+}
+
+int ChordalGraph::getTreeWidth() const {
+	set<NodeSet> maximalCliques = getMaximalCliques();
+	int maxSize = 0;
+	for (set<NodeSet>::iterator i=maximalCliques.begin(); i!=maximalCliques.end(); ++i) {
+		if (maxSize < (int)(*i).size()) {
+			maxSize = (*i).size();
+		}
+	}
+	return maxSize - 1;
+}
+
+long long ChordalGraph::getExpBagsSize() const {
+	set<NodeSet> maximalCliques = getMaximalCliques();
+	long long result = 0;
+	for (set<NodeSet>::iterator i=maximalCliques.begin(); i!=maximalCliques.end(); ++i) {
+		result += pow((double)2,(double)(*i).size());
+	}
+	return result;
+}
+
 
 void ChordalGraph::printTriangulation(const Graph& origin) const {
 	vector< set<Node> > fillEdges = getFillEdges(origin);
