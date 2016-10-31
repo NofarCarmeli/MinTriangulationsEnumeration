@@ -78,34 +78,23 @@ int getFill(const Graph& g, Node v) {
 	return twiceFillEdges/2;
 }
 
-class NodeSetStaturator {
-	set<NodeSet> toSaturate;
-public:
-	void markForSaturation(const vector<Node>& nodeSet) {
-		toSaturate.insert(nodeSet);
-	}
-	void saturate(Graph& g) {
-		g.saturateNodeSets(toSaturate);
-	}
-};
-
 // Returns the minimal separators included in the neighborhood of v
-NodeSetStaturator getSubstars(const Graph& g, const Graph& gi, Node v) {
+set<NodeSet> getSubstars(const Graph& g, const Graph& gi, Node v) {
 	set<Node> removedNodes = gi.getNeighbors(v);
 	removedNodes.insert(v);
 	vector<NodeSet> components = g.getComponents(removedNodes);
-	NodeSetStaturator saturator;
+	set<NodeSet> substars;
 	for (vector<NodeSet>::iterator it=components.begin(); it!=components.end(); ++it) {
-		saturator.markForSaturation(g.getNeighbors(*it));
+		substars.insert(g.getNeighbors(*it));
 	}
-	return saturator;
+	return substars;
 }
 
 // Saturates the minimal separators included in the neighborhood of v
 // g is the original graph, and gi is the graph in the last phase.
 void makeNodeLBSimplicial(const Graph& g, Graph& gi, Node v) {
-	NodeSetStaturator saturator =  getSubstars(g, gi, v);
-	saturator.saturate(gi);
+	set<NodeSet> substars =  getSubstars(g, gi, v);
+	gi.saturateNodeSets(substars);
 }
 
 class NodeQueue {
