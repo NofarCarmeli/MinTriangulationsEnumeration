@@ -44,8 +44,8 @@ public:
 	}
 	string getName(){ return name; }
 	string getPath(){ return wholename; }
-	string getField(){ return innerContainingFolder; }
-	string getType(){ return outerContainingFolder; }
+	string getField(){ return outerContainingFolder; }
+	string getType(){ return innerContainingFolder; }
 };
 
 
