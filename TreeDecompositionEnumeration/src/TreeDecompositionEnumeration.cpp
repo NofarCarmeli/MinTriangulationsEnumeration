@@ -136,7 +136,8 @@ int main(int argc, char* argv[]) {
 	ofstream output;
 	output.open(outputFileName.c_str());
 	cout << setprecision(2);
-	cout << "Starting enumeration for " << inputFile.getName() << endl;
+	cout << "Starting enumeration for " << inputFile.getField() << "\\"
+			<< inputFile.getType() << "\\" << inputFile.getName() << endl;
 	clock_t startTime = clock();
 	ResultsHandler results(g, output, false);
 	bool timeLimitExceeded = false;
