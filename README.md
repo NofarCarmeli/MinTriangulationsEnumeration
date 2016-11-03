@@ -46,5 +46,6 @@ Options are: size, fill, none. Default is none.
 
 ## Output
 
-The full list of triangulations is saved to a file in the current directory, while a summary is printed to the screen.
-The output file is `<input_file_name>.output.<triangulation_heuristic>.<triangulations_order>.<separators_order>.csv` (or `<input-name>.output.csv` if no heuristics are specified).
+The full list of triangulations is saved to a file in the current directory.
+The output file is `<input_file>.output.<triangulation_heuristic>.<triangulations_order>.<separators_order>.csv` (or `<input-name>.output.csv` if no heuristics are specified).
+A summary is printed to the screen and saved to a table in summary.csv in the current directory.

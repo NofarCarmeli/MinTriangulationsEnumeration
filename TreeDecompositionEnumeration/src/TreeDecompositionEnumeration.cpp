@@ -48,6 +48,19 @@ public:
 	string getType(){ return innerContainingFolder; }
 };
 
+void printSummaryHeader(ofstream& summaryOutput) {
+	summaryOutput << "Field, Type, Graph, Nodes, Edges, Time, Algorithm, Separators generated, ";
+	ResultsHandler::printTableSummaryHeader(summaryOutput);
+}
+
+void printSummary(ofstream& summaryOutput, InputFile& input, Graph& graph,
+		double time, string algorithm, int separators, ResultsHandler& results) {
+	summaryOutput << input.getField() << ", " << input.getType() << ", " << input.getName()
+			<< ", " << graph.getNumberOfNodes() << ", " << graph.getNumberOfEdges() << ", "
+			<< time << ", " << algorithm << ", " << separators << ", ";
+	results.printTableSummary(summaryOutput);
+}
+
 
 /**
  * First parameter is the graph file path. Second is timeout in seconds.
@@ -63,7 +76,6 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	InputFile inputFile(argv[1]);
-	string outputFileName = inputFile.getName() + ".output";
 	bool isTimeLimited = false;
 	int timeLimitInSeconds = -1;
 	if (argc >= 3) {
@@ -72,10 +84,11 @@ int main(int argc, char* argv[]) {
 			isTimeLimited = true;
 		}
 	}
+	string algorithm = "mcs";
 	TriangulationAlgorithm heuristic = MCS_M;
 	if (argc >=4) {
 		string heuristicName = argv[3];
-		outputFileName = outputFileName + "." + heuristicName;
+		algorithm = heuristicName;
 		if (heuristicName == "mcs") {
 			heuristic = MCS_M;
 		} else if (heuristicName == "degree") {
@@ -98,7 +111,7 @@ int main(int argc, char* argv[]) {
 	TriangulationScoringCriterion criterion = NONE;
 	if (argc >=5) {
 		string criterionName = argv[4];
-		outputFileName = outputFileName + "." + criterionName;
+		algorithm = algorithm + "." + criterionName;
 		if (criterionName == "fill") {
 			criterion = FILL;
 		} else if (criterionName == "width") {
@@ -117,7 +130,7 @@ int main(int argc, char* argv[]) {
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
 	if (argc >=6) {
 		string criterionName = argv[5];
-		outputFileName = outputFileName + "." + criterionName;
+		algorithm = algorithm + "." + criterionName;
 		if (criterionName == "size") {
 			separatorsOrder = ASCENDING_SIZE;
 		} else if (criterionName == "none") {
@@ -129,20 +142,29 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	}
-	outputFileName = outputFileName + ".csv";
+	string outputFileName = inputFile.getField() + "." + inputFile.getType()
+			+ "." + inputFile.getName() + "." + algorithm + ".csv";
 
 	// Manage files and initialize variables
 	Graph g = GraphReader::read(inputFile.getPath());
-	ofstream output;
-	output.open(outputFileName.c_str());
+	ofstream detailedOutput;
+	detailedOutput.open(outputFileName.c_str());
+	string summaryFileName = "summary.csv";
+	ofstream summaryOutput;
+	if (!ifstream(summaryFileName.c_str()).good()) { // summary file doesn't exist
+		summaryOutput.open(summaryFileName.c_str());
+		printSummaryHeader(summaryOutput);
+	} else  {
+		summaryOutput.open(summaryFileName.c_str(), ios::app);
+	}
 	cout << setprecision(2);
 	cout << "Starting enumeration for " << inputFile.getField() << "\\"
 			<< inputFile.getType() << "\\" << inputFile.getName() << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, output, false);
+	ResultsHandler results(g, detailedOutput, false);
 	bool timeLimitExceeded = false;
 
-	// generate and print the results to output file
+	// generate and print the results to detailedOutput file
 	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder, heuristic);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
@@ -153,17 +175,21 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
-	output.close();
+	detailedOutput.close();
 
-	// Output summary to standard output
+	// Print summary to file
+	double totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
+	int separators = enumerator.getNumberOfMinimalSeperatorsGenerated();
+	printSummary(summaryOutput, inputFile, g, totalTimeInSeconds, algorithm, separators, results);
+	// Output summary to standard detailedOutput
 	if (timeLimitExceeded) {
 		cout << "Time limit reached." << endl;
 	} else {
 		cout << "All minimal triangulations were generated!" << endl;
 	}
-	results.printSummary(cout);
+	results.printReadableSummary(cout);
 	cout << "The graph has " << g.getNumberOfNodes() << " nodes and " << g.getNumberOfEdges() << " edges. ";
-	cout << enumerator.getNumberOfMinimalSeperatorsGenerated() << " minimal separators were generated in the process." << endl;
+	cout << separators << " minimal separators were generated in the process." << endl;
 
 	return 0;
 }

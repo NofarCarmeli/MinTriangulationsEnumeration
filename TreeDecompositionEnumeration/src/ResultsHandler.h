@@ -122,7 +122,17 @@ public:
 			currentResult.printCsvByTime(output);
 		}
 	}
-	void printSummary(ostream& output) {
+	static void printTableSummaryHeader(ostream& output) {
+		output << "Results, First Width, Best Width, Best Width Count, Good width Count, ";
+		output << "First Fill, Best Fill, First ExpBags, Best ExpBags" << endl;
+	}
+	void printTableSummary(ostream& output) {
+		output << resultsFound << ", " << firstWidth << ", " << minWidth << ", "
+				<< resultsWithMinWidthCount << ", " << resultsWithGoodWidthCount
+				<< ", " << firstResult.getFill() << ", " << minFill << ", "
+				<< firstResult.getExpBagSize() << ", " << minBagExpSize << endl;
+	}
+	void printReadableSummary(ostream& output) {
 		output << resultsFound << " results found, ";
 		output << "total time " << getTime() << " seconds." << endl;
 		if (minWidth == maxWidth) {
