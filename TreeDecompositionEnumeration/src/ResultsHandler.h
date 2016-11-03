@@ -57,7 +57,9 @@ class ResultsHandler {
 	int minWidth, maxWidth;
 	int minFill, maxFill;
 	long long minBagExpSize, maxBagExpSize;
+	int firstWidth;
 	int resultsWithMinWidthCount;
+	int resultsWithGoodWidthCount; // Good = Width at least as good as the first one
 	int resultsFound;
 	double getTime() {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
@@ -65,9 +67,9 @@ class ResultsHandler {
 public:
 	ResultsHandler(const Graph& g, ostream& o, bool onlyPrintImprovements) :
 				graph(g), output(o), onlyPrintImprovements(onlyPrintImprovements),
-				minWidth(0), maxWidth(0), minFill(0), maxFill(0),
-				minBagExpSize(0), maxBagExpSize(0),
-				resultsWithMinWidthCount(0), resultsFound(0) {
+				minWidth(0), maxWidth(0), minFill(0), maxFill(0), minBagExpSize(0),
+				maxBagExpSize(0), firstWidth(0), resultsWithMinWidthCount(0),
+				resultsWithGoodWidthCount(0), resultsFound(0) {
 		startTime = clock();
 	}
 	void newResult(const ChordalGraph& triangulation) {
@@ -77,17 +79,17 @@ public:
 		int fill = currentResult.getFill();
 		long long bagExpSize = currentResult.getExpBagSize();
 		if (resultsFound == 1) {
-			firstResult = currentResult;
-			minWidthResult = currentResult;
-			minFillResult = currentResult;
-			minBagExpSizeResult = currentResult;
-			minWidth = maxWidth = width;
+			minBagExpSizeResult = minFillResult = minWidthResult = firstResult = currentResult;
+			firstWidth = minWidth = maxWidth = width;
 			minFill = maxFill = fill;
 			minBagExpSize = maxBagExpSize = bagExpSize;
-			resultsWithMinWidthCount = 1;
+			resultsWithGoodWidthCount = resultsWithMinWidthCount = 1;
 			ResultInformation::printCsvHeaderByTime(output);
 			print = true;
 		} else {
+			if (width <= firstWidth) {
+				resultsWithGoodWidthCount++;
+			}
 			if (width < minWidth) {
 				minWidthResult = currentResult;
 				minWidth = width;
@@ -123,11 +125,10 @@ public:
 	void printSummary(ostream& output) {
 		output << resultsFound << " results found, ";
 		output << "total time " << getTime() << " seconds." << endl;
-		output << resultsWithMinWidthCount << " results with minimal width, ";
 		if (minWidth == maxWidth) {
-			output << "width " << minWidth << ", ";
+			output << "Width " << minWidth << ", ";
 		} else {
-			output << "width " << minWidth << "-" << maxWidth << ", ";
+			output << "Width " << minWidth << "-" << maxWidth << ", ";
 		}
 		if (minFill == maxFill) {
 			output << "fill " << minFill << ", ";
@@ -141,6 +142,8 @@ public:
 					<< "-" << maxBagExpSize << ".";
 		}
 		output <<endl;
+		output << resultsWithMinWidthCount << " results with minimal width, ";
+		output << resultsWithGoodWidthCount << " results with width at least as good as the first found." << endl;
 		if (resultsFound > 1) {
 			output << "First result: ";
 			firstResult.printDetails(output);

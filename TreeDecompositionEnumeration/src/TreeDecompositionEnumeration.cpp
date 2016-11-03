@@ -161,6 +161,8 @@ int main(int argc, char* argv[]) {
 		cout << "All minimal triangulations were generated!" << endl;
 	}
 	results.printSummary(cout);
+	cout << "The graph has " << g.getNumberOfNodes() << " nodes and " << g.getNumberOfEdges() << " edges. ";
+	cout << enumerator.getNumberOfMinimalSeperatorsGenerated() << " minimal separators were generated in the process." << endl;
 
 	return 0;
 }
