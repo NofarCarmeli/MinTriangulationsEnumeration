@@ -4,13 +4,14 @@
 namespace tdenum {
 
 SeparatorGraph::SeparatorGraph(const Graph& g, SeparatorsScoringCriterion c) :
-		graph(g), nodesEnumerator(g, c) {}
+		graph(g), nodesEnumerator(g, c), nodesGenerated(0) {}
 
 bool SeparatorGraph::hasNextNode() {
 	return nodesEnumerator.hasNext();
 }
 
 MinimalSeparator SeparatorGraph::nextNode() {
+	nodesGenerated++;
 	return nodesEnumerator.next();
 }
 
@@ -32,6 +33,10 @@ bool SeparatorGraph::hasEdge(const MinimalSeparator& s, const MinimalSeparator& 
 		}
 	}
 	return false;
+}
+
+int SeparatorGraph::getNumberOfNodesGenerated() {
+	return nodesGenerated;
 }
 
 } /* namespace tdenum */

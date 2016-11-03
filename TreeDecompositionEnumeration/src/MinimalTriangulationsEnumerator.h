@@ -27,6 +27,8 @@ public:
 	bool hasNext();
 	// Returns another minimal triangulation
 	ChordalGraph next();
+	// Returns the number of minimal separators generated
+	int getNumberOfMinimalSeperatorsGenerated();
 };
 
 } /* namespace tdenum */

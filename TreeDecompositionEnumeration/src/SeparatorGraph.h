@@ -13,6 +13,7 @@ namespace tdenum {
 class SeparatorGraph : public SuccinctGraphRepresentation<MinimalSeparator> {
 	Graph graph;
 	MinimalSeparatorsEnumerator nodesEnumerator;
+	int nodesGenerated;
 public:
 	// Initialization
 	SeparatorGraph(const Graph& g, SeparatorsScoringCriterion c);
@@ -22,6 +23,8 @@ public:
 	virtual MinimalSeparator nextNode();
 	// Checks whether the minimal separators are crossing
 	virtual bool hasEdge(const MinimalSeparator& u, const MinimalSeparator& v);
+	// Returns how many nodes were already generated
+	int getNumberOfNodesGenerated();
 };
 
 } /* namespace tdenum */

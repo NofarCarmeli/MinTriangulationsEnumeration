@@ -27,5 +27,9 @@ ChordalGraph MinimalTriangulationsEnumerator::next() {
 	return Converter::minimalSeparatorsToTriangulation(graph, setsEnumerator.next());
 }
 
+int MinimalTriangulationsEnumerator::getNumberOfMinimalSeperatorsGenerated() {
+	return separatorGraph.getNumberOfNodesGenerated();
+}
+
 } /* namespace tdenum */
 
