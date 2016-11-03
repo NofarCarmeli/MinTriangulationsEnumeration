@@ -10,6 +10,44 @@
 using namespace std;
 using namespace tdenum;
 
+class InputFile {
+	string name;
+	string wholename;
+	string innerContainingFolder;
+	string outerContainingFolder;
+public:
+	InputFile(string path) : wholename(path) {
+		string::size_type lastSlash = path.find_last_of("\\/");
+		if(lastSlash == string::npos) {
+			name = path;
+			innerContainingFolder = "None";
+			outerContainingFolder = "None";
+		} else {
+			string nameWithExtension = path.substr(lastSlash+1);
+			name = nameWithExtension.substr(0, nameWithExtension.find_last_of("."));
+			path = path.substr(0, lastSlash);
+			lastSlash = path.find_last_of("\\/");
+			if(lastSlash == string::npos) {
+				innerContainingFolder = "None";
+				outerContainingFolder = "None";
+			} else {
+				innerContainingFolder = path.substr(lastSlash+1);
+				path = path.substr(0, lastSlash);
+				lastSlash = path.find_last_of("\\/");
+				if(lastSlash == string::npos) {
+					outerContainingFolder = "None";
+				} else {
+					outerContainingFolder = path.substr(lastSlash+1);
+				}
+			}
+		}
+	}
+	string getName(){ return name; }
+	string getPath(){ return wholename; }
+	string getField(){ return innerContainingFolder; }
+	string getType(){ return outerContainingFolder; }
+};
+
 
 /**
  * First parameter is the graph file path. Second is timeout in seconds.
@@ -24,8 +62,8 @@ int main(int argc, char* argv[]) {
 		cout << "No graph file specified" << endl;
 		return 0;
 	}
-	string inputFileName = argv[1];
-	string outputFileName = inputFileName + ".output";
+	InputFile inputFile(argv[1]);
+	string outputFileName = inputFile.getName() + ".output";
 	bool isTimeLimited = false;
 	int timeLimitInSeconds = -1;
 	if (argc >= 3) {
@@ -94,11 +132,11 @@ int main(int argc, char* argv[]) {
 	outputFileName = outputFileName + ".csv";
 
 	// Manage files and initialize variables
-	Graph g = GraphReader::read(inputFileName);
+	Graph g = GraphReader::read(inputFile.getPath());
 	ofstream output;
 	output.open(outputFileName.c_str());
 	cout << setprecision(2);
-	cout << "Starting enumeration for "  << inputFileName << endl;
+	cout << "Starting enumeration for " << inputFile.getName() << endl;
 	clock_t startTime = clock();
 	ResultsHandler results(g, output, false);
 	bool timeLimitExceeded = false;
