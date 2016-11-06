@@ -123,14 +123,14 @@ public:
 		}
 	}
 	static void printTableSummaryHeader(ostream& output) {
-		output << "Results, First Width, Best Width, Best Width Count, Good width Count, ";
-		output << "First Fill, Best Fill, First ExpBags, Best ExpBags" << endl;
+		output << "Results, First Width, Min Width, Max Width, Best Width Count, Good width Count, ";
+		output << "First Fill, Min Fill, Max Fill, First ExpBags, Min ExpBags, Max ExpBags" << endl;
 	}
 	void printTableSummary(ostream& output) {
-		output << resultsFound << ", " << firstWidth << ", " << minWidth << ", "
+		output << resultsFound << ", " << firstWidth << ", " << minWidth << ", " << maxWidth << ", "
 				<< resultsWithMinWidthCount << ", " << resultsWithGoodWidthCount
-				<< ", " << firstResult.getFill() << ", " << minFill << ", "
-				<< firstResult.getExpBagSize() << ", " << minBagExpSize << endl;
+				<< ", " << firstResult.getFill() << ", " << minFill << ", " << maxFill << ", "
+				<< firstResult.getExpBagSize() << ", " << minBagExpSize << ", " << maxBagExpSize << endl;
 	}
 	void printReadableSummary(ostream& output) {
 		output << resultsFound << " results found, ";

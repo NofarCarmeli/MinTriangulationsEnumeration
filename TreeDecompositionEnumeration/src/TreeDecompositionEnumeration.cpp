@@ -49,15 +49,17 @@ public:
 };
 
 void printSummaryHeader(ofstream& summaryOutput) {
-	summaryOutput << "Field, Type, Graph, Nodes, Edges, Time, Algorithm, Separators generated, ";
+	summaryOutput << "Field, Type, Graph, Nodes, Edges, Finished, Time, Algorithm, Separators generated, ";
 	ResultsHandler::printTableSummaryHeader(summaryOutput);
 }
 
-void printSummary(ofstream& summaryOutput, InputFile& input, Graph& graph,
+void printSummary(ofstream& summaryOutput, InputFile& input, Graph& graph, bool timeLimitExceeded,
 		double time, string algorithm, int separators, ResultsHandler& results) {
+	string finished = timeLimitExceeded ? "No" : "Yes";
 	summaryOutput << input.getField() << ", " << input.getType() << ", " << input.getName()
 			<< ", " << graph.getNumberOfNodes() << ", " << graph.getNumberOfEdges() << ", "
-			<< time << ", " << algorithm << ", " << separators << ", ";
+			<< finished << ", " << time << ", " << algorithm
+			<< ", " << separators << ", ";
 	results.printTableSummary(summaryOutput);
 }
 
@@ -180,7 +182,7 @@ int main(int argc, char* argv[]) {
 	// Print summary to file
 	double totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
 	int separators = enumerator.getNumberOfMinimalSeperatorsGenerated();
-	printSummary(summaryOutput, inputFile, g, totalTimeInSeconds, algorithm, separators, results);
+	printSummary(summaryOutput, inputFile, g, timeLimitExceeded, totalTimeInSeconds, algorithm, separators, results);
 	// Output summary to standard detailedOutput
 	if (timeLimitExceeded) {
 		cout << "Time limit reached." << endl;
