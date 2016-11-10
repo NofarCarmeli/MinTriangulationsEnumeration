@@ -45,10 +45,12 @@ public:
 	}
 };
 
+enum WhenToPrint { NEVER, ALWAYS, IF_IMPROVED };
+
 class ResultsHandler {
 	Graph graph;
 	ostream& output;
-	bool onlyPrintImprovements;
+	WhenToPrint whenToPrint;
 	clock_t startTime;
 	ResultInformation firstResult;
 	ResultInformation minWidthResult;
@@ -65,8 +67,8 @@ class ResultsHandler {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
 	}
 public:
-	ResultsHandler(const Graph& g, ostream& o, bool onlyPrintImprovements) :
-				graph(g), output(o), onlyPrintImprovements(onlyPrintImprovements),
+	ResultsHandler(const Graph& g, ostream& o, WhenToPrint p) :
+				graph(g), output(o), whenToPrint(p),
 				minWidth(0), maxWidth(0), minFill(0), maxFill(0), minBagExpSize(0),
 				maxBagExpSize(0), firstWidth(0), resultsWithMinWidthCount(0),
 				resultsWithGoodWidthCount(0), resultsFound(0) {
@@ -115,8 +117,10 @@ public:
 				maxBagExpSize = bagExpSize;
 			}
 		}
-		if (!onlyPrintImprovements) {
+		if (whenToPrint == ALWAYS) {
 			print = true;
+		} else if (whenToPrint == NEVER){
+			print = false;
 		}
 		if (print) {
 			currentResult.printCsvByTime(output);

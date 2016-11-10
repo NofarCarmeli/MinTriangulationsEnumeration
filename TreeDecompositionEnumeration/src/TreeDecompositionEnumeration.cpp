@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
 	cout << "Starting enumeration for " << inputFile.getField() << "\\"
 			<< inputFile.getType() << "\\" << inputFile.getName() << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, detailedOutput, false);
+	ResultsHandler results(g, detailedOutput, NEVER);
 	bool timeLimitExceeded = false;
 
 	// generate and print the results to detailedOutput file
