@@ -72,85 +72,100 @@ void printSummary(ofstream& summaryOutput, InputFile& input, Graph& graph, bool 
  * (ascending), fill or none.
  */
 int main(int argc, char* argv[]) {
-	// Parse input
+	// Parse input graph file
 	if (argc < 2) {
 		cout << "No graph file specified" << endl;
 		return 0;
 	}
 	InputFile inputFile(argv[1]);
+	Graph g = GraphReader::read(inputFile.getPath());
+
+	// Define default parameters
 	bool isTimeLimited = false;
 	int timeLimitInSeconds = -1;
-	if (argc >= 3) {
-		timeLimitInSeconds = atoi(argv[2]);
-		if (timeLimitInSeconds >= 0) {
-			isTimeLimited = true;
-		}
-	}
-	string algorithm = "mcs";
+	WhenToPrint print = NEVER;
+	string algorithm = "";
 	TriangulationAlgorithm heuristic = MCS_M;
-	if (argc >=4) {
-		string heuristicName = argv[3];
-		algorithm = heuristicName;
-		if (heuristicName == "mcs") {
-			heuristic = MCS_M;
-		} else if (heuristicName == "degree") {
-			heuristic = MIN_DEGREE_LB_TRIANG;
-		} else if (heuristicName == "fill") {
-			heuristic = MIN_FILL_LB_TRIANG;
-		}  else if (heuristicName == "initialDegree") {
-			heuristic = INITIAL_DEGREE_LB_TRIANG;
-		} else if (heuristicName == "initialFill") {
-			heuristic = INITIAL_FILL_LB_TRIANG;
-		} else if (heuristicName == "lb") {
-			heuristic = LB_TRIANG;
-		} else if (heuristicName == "combined") {
-			heuristic = COMBINED;
-		} else {
-			cout << "Triangulation algorithm not recognized" << endl;
-			return 0;
-		}
-	}
-	TriangulationScoringCriterion criterion = NONE;
-	if (argc >=5) {
-		string criterionName = argv[4];
-		algorithm = algorithm + "." + criterionName;
-		if (criterionName == "fill") {
-			criterion = FILL;
-		} else if (criterionName == "width") {
-			criterion = WIDTH;
-		} else if (criterionName == "difference") {
-			criterion = DIFFERENECE;
-		} else if (criterionName == "sepsize") {
-			criterion = MAX_SEP_SIZE;
-		} else if (criterionName == "none") {
-			criterion = NONE;
-		} else {
-			cout << "Triangulation scoring criterion not recognized" << endl;
-			return 0;
-		}
-	}
+	TriangulationScoringCriterion triangulationsOrder = NONE;
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
-	if (argc >=6) {
-		string criterionName = argv[5];
-		algorithm = algorithm + "." + criterionName;
-		if (criterionName == "size") {
-			separatorsOrder = ASCENDING_SIZE;
-		} else if (criterionName == "none") {
-			separatorsOrder = UNIFORM;
-		} else if (criterionName == "fill") {
-			separatorsOrder = FILL_EDGES;
-		} else {
-			cout << "Seperators scoring criterion not recognized" << endl;
-			return 0;
+
+	// Replace parameter specified
+	for (int i=2; i<argc; i++) {
+		string argument = argv[i];
+		string flagName = argument.substr(0, argument.find_last_of("="));
+		string flagValue = argument.substr(argument.find_last_of("=")+1);
+		if (flagName == "time_limit") {
+			timeLimitInSeconds = atoi(flagValue.c_str());
+			if (timeLimitInSeconds >= 0) {
+				isTimeLimited = true;
+			}
+		} else if (flagName == "print") {
+			if (flagValue == "all") {
+				print = ALWAYS;
+			} else if (flagValue == "none") {
+				print = NEVER;
+			} else if (flagValue == "improved") {
+				print = IF_IMPROVED;
+			}
+		} else if (flagName == "alg") {
+			algorithm = algorithm + "." + flagValue;
+			if (flagValue == "mcs") {
+				heuristic = MCS_M;
+			} else if (flagValue == "degree") {
+				heuristic = MIN_DEGREE_LB_TRIANG;
+			} else if (flagValue == "fill") {
+				heuristic = MIN_FILL_LB_TRIANG;
+			}  else if (flagValue == "initialDegree") {
+				heuristic = INITIAL_DEGREE_LB_TRIANG;
+			} else if (flagValue == "initialFill") {
+				heuristic = INITIAL_FILL_LB_TRIANG;
+			} else if (flagValue == "lb") {
+				heuristic = LB_TRIANG;
+			} else if (flagValue == "combined") {
+				heuristic = COMBINED;
+			} else {
+				cout << "Triangulation algorithm not recognized" << endl;
+				return 0;
+			}
+		} else if (flagName == "t_order") {
+			algorithm = algorithm + "." + flagValue;
+			if (flagValue == "fill") {
+				triangulationsOrder = FILL;
+			} else if (flagValue == "width") {
+				triangulationsOrder = WIDTH;
+			} else if (flagValue == "difference") {
+				triangulationsOrder = DIFFERENECE;
+			} else if (flagValue == "sepsize") {
+				triangulationsOrder = MAX_SEP_SIZE;
+			} else if (flagValue == "none") {
+				triangulationsOrder = NONE;
+			} else {
+				cout << "Triangulation scoring criterion not recognized" << endl;
+				return 0;
+			}
+		} else if (flagName == "s_order") {
+			algorithm = algorithm + "." + flagValue;
+			if (flagValue == "size") {
+				separatorsOrder = ASCENDING_SIZE;
+			} else if (flagValue == "none") {
+				separatorsOrder = UNIFORM;
+			} else if (flagValue == "fill") {
+				separatorsOrder = FILL_EDGES;
+			} else {
+				cout << "Seperators scoring criterion not recognized" << endl;
+				return 0;
+			}
 		}
 	}
-	string outputFileName = inputFile.getField() + "." + inputFile.getType()
-			+ "." + inputFile.getName() + "." + algorithm + ".csv";
 
-	// Manage files and initialize variables
-	Graph g = GraphReader::read(inputFile.getPath());
+	// Open output files
 	ofstream detailedOutput;
-	detailedOutput.open(outputFileName.c_str());
+	if (print != NEVER) {
+		algorithm = algorithm != "" ? algorithm : "mcs";
+		string outputFileName = inputFile.getField() + "." + inputFile.getType()
+				+ "." + inputFile.getName() + "." + algorithm + ".csv";
+		detailedOutput.open(outputFileName.c_str());
+	}
 	string summaryFileName = "summary.csv";
 	ofstream summaryOutput;
 	if (!ifstream(summaryFileName.c_str()).good()) { // summary file doesn't exist
@@ -159,15 +174,17 @@ int main(int argc, char* argv[]) {
 	} else  {
 		summaryOutput.open(summaryFileName.c_str(), ios::app);
 	}
+
+	// Initialize variables
 	cout << setprecision(2);
 	cout << "Starting enumeration for " << inputFile.getField() << "\\"
 			<< inputFile.getType() << "\\" << inputFile.getName() << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, detailedOutput, NEVER);
+	ResultsHandler results(g, detailedOutput, print);
 	bool timeLimitExceeded = false;
 
-	// generate and print the results to detailedOutput file
-	MinimalTriangulationsEnumerator enumerator(g, criterion, separatorsOrder, heuristic);
+	// Generate the results and print details if asked for
+	MinimalTriangulationsEnumerator enumerator(g, triangulationsOrder, separatorsOrder, heuristic);
 	while (enumerator.hasNext()) {
 		ChordalGraph triangulation = enumerator.next();
 		results.newResult(triangulation);
@@ -177,13 +194,18 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
-	detailedOutput.close();
+	if (print != NEVER) {
+		detailedOutput.close();
+	}
 
 	// Print summary to file
 	double totalTimeInSeconds = double(clock() - startTime) / CLOCKS_PER_SEC;
 	int separators = enumerator.getNumberOfMinimalSeperatorsGenerated();
-	printSummary(summaryOutput, inputFile, g, timeLimitExceeded, totalTimeInSeconds, algorithm, separators, results);
-	// Output summary to standard detailedOutput
+	printSummary(summaryOutput, inputFile, g, timeLimitExceeded,
+			totalTimeInSeconds, algorithm, separators, results);
+	summaryOutput.close();
+
+	// Print summary to standard output
 	if (timeLimitExceeded) {
 		cout << "Time limit reached." << endl;
 	} else {

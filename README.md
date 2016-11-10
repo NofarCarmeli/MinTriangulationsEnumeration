@@ -4,9 +4,9 @@ Implements enumeration of all minimal triangulations of a graph as described in 
 
 ## Input
 
-Specify input file and configuration using command line arguments:
+Specify input file as the first argument, and possibly other configuration options using command line arguments. e.g:
 ```
-./TreeDecompositionEnumeration <input_file> <time_limit> <triangulation_heuristic> <triangulations_order> <separators_order>
+./TreeDecompositionEnumeration C:\Graph\1.uai time_limit=30 alg=fill
 ```
 Only the input file is required.
 
@@ -14,12 +14,14 @@ Only the input file is required.
 Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
 * csv - each line holds name of variables in a clique.
 
-### time_limit
+### Time Limit
+Flag name: time_limit.
 Time in seconds after which no more results are extended. The current one will finish extending, and all results that were found but not extended yet will be printed as well.
 -1 means no time limit.
 Default is no time limit.
 
-### triangualtion_heuristic
+### Triangualtion Heuristic
+Flag name: alg.
 The heuristic used for generating a single minimal triangulation.
 Options are: mcs, degree, fill. Default is mcs.
 * msc - using MCS-M algorithm.
@@ -30,7 +32,8 @@ Options are: mcs, degree, fill. Default is mcs.
 * initalFill - using LB-Triang algorithm, determining the order of vertices up-front by the min-fill.
 * combined - runs msc and fill alternatively.
 
-### triangulations_order
+### Triangulations Order
+Flag name: t_order.
 The order of extending the generated minimal triangulations.
 Options are: width, fill, difference, sepsize, none. Default is none.
 * width - lowest width first.
@@ -38,14 +41,22 @@ Options are: width, fill, difference, sepsize, none. Default is none.
 * difference - lowest number of fill edges that were seen in previously extended triangulations.
 * sepsize - lowest size of maximal separator size.
 
-### separators_order
+### Separators Order
+Flag name: s_order.
 The order of extending the minimal separators.
 Options are: size, fill, none. Default is none.
 * size - lowest size first.
 * fill - lowest number of pairs in the separator that don't share an edge.
 
+### Detailed Output
+Flag name: print.
+The results to print to a details file.
+Options are: all, none, improved. Default is none.
+* none - does not generate a details file.
+* all - prints all results.
+* improved - prints only results that show improvement in one of the measures printed.
+
 ## Output
 
-The full list of triangulations is saved to a file in the current directory.
-The output file is `<input_file>.output.<triangulation_heuristic>.<triangulations_order>.<separators_order>.csv` (or `<input-name>.output.csv` if no heuristics are specified).
-A summary is printed to the screen and saved to a table in summary.csv in the current directory.
+A summary of the results is printed to the screen and saved to a table in summary.csv in the current directory.
+Depending on the value of the Print flag, The full list of triangulations may be saved to a csv file in the current directory, with the name of the input file followed by the configuration options.
