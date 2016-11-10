@@ -28,6 +28,7 @@ public:
 		width = result.getTreeWidth();
 		expBagSize = result.getExpBagsSize();
 	}
+	int getTime() { return time; }
 	int getFill() { return fill; }
 	int getWidth() { return width; }
 	long long getExpBagSize() { return expBagSize; }
@@ -127,14 +128,19 @@ public:
 		}
 	}
 	static void printTableSummaryHeader(ostream& output) {
-		output << "Results, First Width, Min Width, Max Width, Best Width Count, Good width Count, ";
-		output << "First Fill, Min Fill, Max Fill, First ExpBags, Min ExpBags, Max ExpBags" << endl;
+		output << "Results, First Width, Min Width, Max Width, Best Width Time,";
+		output << "Best Width Count, Good width Count, First Fill, Min Fill, ";
+		output << "Max Fill, Best Fill Time, First ExpBags, Min ExpBags, ";
+		output << "Max ExpBags, Best ExpBags Time" << endl;
 	}
 	void printTableSummary(ostream& output) {
-		output << resultsFound << ", " << firstWidth << ", " << minWidth << ", " << maxWidth << ", "
+		output << resultsFound << ", " << firstWidth << ", " << minWidth << ", "
+				<< maxWidth << ", " << minWidthResult.getTime() << ", "
 				<< resultsWithMinWidthCount << ", " << resultsWithGoodWidthCount
-				<< ", " << firstResult.getFill() << ", " << minFill << ", " << maxFill << ", "
-				<< firstResult.getExpBagSize() << ", " << minBagExpSize << ", " << maxBagExpSize << endl;
+				<< ", " << firstResult.getFill() << ", " << minFill << ", "
+				<< maxFill << ", " << minFillResult.getTime() << ", "
+				<< firstResult.getExpBagSize() << ", " << minBagExpSize
+				<< ", " << maxBagExpSize << ", " << minBagExpSizeResult.getTime() << endl;
 	}
 	void printReadableSummary(ostream& output) {
 		output << resultsFound << " results found, ";
