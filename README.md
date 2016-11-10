@@ -10,7 +10,7 @@ Specify input file as the first argument, and possibly other configuration optio
 ```
 Only the input file is required.
 
-### input_file
+### Input File
 Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
 * csv - each line holds name of variables in a clique.
 
@@ -24,7 +24,7 @@ Default is no time limit.
 Flag name: alg.
 The heuristic used for generating a single minimal triangulation.
 Options are: mcs, degree, fill. Default is mcs.
-* msc - using MCS-M algorithm.
+* mcs - using MCS-M algorithm.
 * lb - using LB-Triang algorithm with no heuristic for the order of vertices (faster than the following two).
 * degree - using LB-Triang algorithm with min-degree heuristic for the order of vertices.
 * initalDegree - using LB-Triang algorithm, determining the order of vertices up-front by the min-degree.
