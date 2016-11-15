@@ -122,6 +122,9 @@ Graph readCSV(ifstream& input) {
 		string nodeName;
 		vector<int> edge;
 		while (getline(lineStream, nodeName, ',' )) {
+			if ( nodeName.size() && nodeName[nodeName.size()-1] == '\r' ) {
+				nodeName = nodeName.substr( 0, nodeName.size() - 1 );
+			}
 			map<string,int>::iterator nameSearchResult = nodeNames.find(nodeName);
 			int nodeNumber;
 			if (nameSearchResult == nodeNames.end()) {
