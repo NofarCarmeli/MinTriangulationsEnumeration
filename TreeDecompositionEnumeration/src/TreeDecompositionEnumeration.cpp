@@ -49,7 +49,7 @@ public:
 };
 
 void printSummaryHeader(ofstream& summaryOutput) {
-	summaryOutput << "Field, Type, Graph, Nodes, Edges, Finished, Time, Algorithm, Separators generated, ";
+	summaryOutput << "Field,Type,Graph,Nodes,Edges,Finished,Time,Algorithm,Separators generated,";
 	ResultsHandler::printTableSummaryHeader(summaryOutput);
 }
 
