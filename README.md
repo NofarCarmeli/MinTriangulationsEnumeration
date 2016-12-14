@@ -1,4 +1,4 @@
-# TreeDecompositionEnumeration
+# MinTriangulationsEnumeration
 
 Implements enumeration of all minimal triangulations of a graph as described in the paper [On the Enumeration of all Minimal Triangulations](http://arxiv.org/abs/1604.02833).
 
@@ -6,7 +6,7 @@ Implements enumeration of all minimal triangulations of a graph as described in 
 
 Specify input file as the first argument, and possibly other configuration options using command line arguments. e.g:
 ```
-./TreeDecompositionEnumeration C:\Graph\1.uai time_limit=30 alg=fill
+./MinTriangulationsEnumeration C:\Graph\1.uai time_limit=30 alg=fill
 ```
 Only the input file is required.
 
@@ -16,21 +16,21 @@ Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
 
 ### Time Limit
 Flag name: time_limit.
-Time in seconds after which no more results are extended. The current one will finish extending, and all results that were found but not extended yet will be printed as well.
+The next result after this specified time will be the last. Time is specified in seconds.
 -1 means no time limit.
 Default is no time limit.
 
 ### Triangualtion Heuristic
 Flag name: alg.
 The heuristic used for generating a single minimal triangulation.
-Options are: mcs, degree, fill. Default is mcs.
+Options are: mcs, lb, degree, initalDegree, fill, initalFill, and combined. Default is mcs.
 * mcs - using MCS-M algorithm.
-* lb - using LB-Triang algorithm with no heuristic for the order of vertices (faster than the following two).
+* lb - using LB-Triang algorithm with no heuristic for the order of vertices (faster than the following options).
 * degree - using LB-Triang algorithm with min-degree heuristic for the order of vertices.
 * initalDegree - using LB-Triang algorithm, determining the order of vertices up-front by the min-degree.
 * fill - using LB-Triang algorithm with min-fill heuristic for the order of vertices.
 * initalFill - using LB-Triang algorithm, determining the order of vertices up-front by the min-fill.
-* combined - runs msc and fill alternatively.
+* combined - runs fill and mcs alternatively in each iteration.
 
 ### Triangulations Order
 Flag name: t_order.
