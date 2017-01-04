@@ -30,6 +30,8 @@ public:
 	long long getExpBagsSize() const;
 	// Prints the edges in this graph and not in the origin
 	void printTriangulation(const Graph& origin) const;
+	// Prints a clique of the largest size
+	void printMaximumClique() const;
 };
 
 } /* namespace tdenum */

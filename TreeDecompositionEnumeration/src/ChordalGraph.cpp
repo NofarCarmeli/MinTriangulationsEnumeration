@@ -127,4 +127,21 @@ void ChordalGraph::printTriangulation(const Graph& origin) const {
 	}
 }
 
+
+void ChordalGraph::printMaximumClique() const {
+	set<NodeSet> maximalCliques = getMaximalCliques();
+	unsigned int maxSize = 0;
+	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
+		maxSize = maxSize < it->size() ? it->size() : maxSize;
+	}
+	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
+		if (it->size() == maxSize) {
+			for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
+				cout << *jt << " ";
+			}
+			cout << endl;
+		}
+	}
+}
+
 } /* namespace tdenum */
