@@ -123,6 +123,8 @@ int main(int argc, char* argv[]) {
 				heuristic = LB_TRIANG;
 			} else if (flagValue == "combined") {
 				heuristic = COMBINED;
+			} else if (flagValue == "separators") {
+				heuristic = SEPARATORS;
 			} else {
 				cout << "Triangulation algorithm not recognized" << endl;
 				return 0;

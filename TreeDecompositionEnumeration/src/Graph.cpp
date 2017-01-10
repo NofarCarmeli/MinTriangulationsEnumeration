@@ -164,6 +164,18 @@ vector<NodeSet> Graph::getComponents(const set<Node>& removedNodes) const {
 	return getComponentsAux(visitedList, numberOfUnhandeledNodes);
 }
 
+vector<NodeSet> Graph::getComponents(const NodeSet& removedNodes) const {
+	vector<int> visitedList(numberOfNodes, 0);
+	for (Node v : removedNodes) {
+		if (!isValidNode(v)) {
+			return vector<NodeSet>();
+		}
+		visitedList[v] = -1;
+	}
+	int numberOfUnhandeledNodes = numberOfNodes - removedNodes.size();
+	return getComponentsAux(visitedList, numberOfUnhandeledNodes);
+}
+
 vector<NodeSet> Graph::getComponentsAux(vector<int> visitedList, int numberOfUnhandeledNodes) const {
 	vector<NodeSet> components;
 	// Finds a new component in each iteration
@@ -241,7 +253,39 @@ vector<int> Graph::getComponentsMap(const vector<Node>& removedNodes) const {
 	return visitedList;
 }
 
-void Graph::print() {
+// Returns the nodes reachable from v after removing removedNodes.
+// Uses a BFS from v, where nodes in removedNodes are not processed.
+set<Node> Graph::getComponent(Node v, const set<Node>& removedNodes) {
+	queue<Node> q;
+	vector<bool> insertedNodes = vector<bool>(numberOfNodes);
+	set<Node> component;
+
+	// Mark removedNodes as inserted to avoid processing them
+	for (Node removed : removedNodes) {
+		insertedNodes[removed] = true;
+	}
+
+	// Initialize the BFS with v
+	component.insert(v);
+	q.push(v);
+	insertedNodes[v] = true;
+	// BFS through the component
+	while (!q.empty()) {
+		v = q.front();
+		q.pop();
+		const set<Node>& neighbors = getNeighbors(v);
+		for (Node neighbor : neighbors) {
+			if (!insertedNodes[neighbor]) {
+				q.push(neighbor);
+				insertedNodes[neighbor] = true;
+				component.insert(neighbor);
+			}
+		}
+	}
+	return component;
+}
+
+void Graph::print() const {
 	for (Node v=0; v<getNumberOfNodes(); v++) {
 		cout << v << " has neighbors: {";
 		for (set<Node>::iterator jt = getNeighbors(v).begin(); jt!=getNeighbors(v).end(); ++jt) {

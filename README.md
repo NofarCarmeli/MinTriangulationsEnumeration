@@ -23,7 +23,7 @@ Default is no time limit.
 ### Triangualtion Heuristic
 Flag name: alg.
 The heuristic used for generating a single minimal triangulation.
-Options are: mcs, lb, degree, initalDegree, fill, initalFill, and combined. Default is mcs.
+Options are: mcs, lb, degree, initalDegree, fill, initalFill, combined and separators. Default is mcs.
 * mcs - using MCS-M algorithm.
 * lb - using LB-Triang algorithm with no heuristic for the order of vertices (faster than the following options).
 * degree - using LB-Triang algorithm with min-degree heuristic for the order of vertices.
@@ -31,6 +31,7 @@ Options are: mcs, lb, degree, initalDegree, fill, initalFill, and combined. Defa
 * fill - using LB-Triang algorithm with min-fill heuristic for the order of vertices.
 * initalFill - using LB-Triang algorithm, determining the order of vertices up-front by the min-fill.
 * combined - runs fill and mcs alternatively in each iteration.
+* separators - using a separator based approch instead of a triangualtion, as described in section 5 of the [paper](http://arxiv.org/abs/1604.02833).
 
 ### Triangulations Order
 Flag name: t_order.

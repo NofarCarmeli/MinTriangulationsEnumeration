@@ -4,6 +4,7 @@
 #include "Graph.h"
 #include "SeparatorGraph.h"
 #include "IndSetExtByTriangulation.h"
+#include "IndSetExtBySeparators.h"
 #include "MaximalIndependentSetsEnumerator.h"
 #include "IndSetScorerByTriangulation.h"
 
@@ -16,7 +17,8 @@ class MinimalTriangulationsEnumerator {
 	Graph graph;
 	SeparatorGraph separatorGraph;
 	MinimalTriangulator triangulator;
-	IndSetExtByTriangulation extender;
+	IndSetExtByTriangulation triExtender;
+	IndSetExtBySeparators sepExtender;
 	IndSetScorerByTriangulation scorer;
 	MaximalIndependentSetsEnumerator<MinimalSeparator> setsEnumerator;
 public:

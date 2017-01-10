@@ -10,8 +10,13 @@ MinimalTriangulationsEnumerator::MinimalTriangulationsEnumerator(
 			const Graph& g, TriangulationScoringCriterion triC,
 			SeparatorsScoringCriterion sepC, TriangulationAlgorithm heuristic) :
 		graph(g), separatorGraph(graph, sepC), triangulator(heuristic),
-		extender(graph, triangulator), scorer(graph, triC),
-		setsEnumerator(separatorGraph, extender, scorer) {}
+		triExtender(graph, triangulator), sepExtender(graph), scorer(graph, triC),
+		setsEnumerator(separatorGraph, triExtender, scorer) {
+	if (heuristic == SEPARATORS) {
+		setsEnumerator = MaximalIndependentSetsEnumerator<MinimalSeparator>(
+				separatorGraph, sepExtender, scorer);
+	}
+}
 
 /*
  * Checks whether there is another minimal triangulation

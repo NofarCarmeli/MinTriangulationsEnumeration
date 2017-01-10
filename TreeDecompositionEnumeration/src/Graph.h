@@ -58,8 +58,13 @@ public:
 	vector<int> getComponentsMap(const vector<Node>& removedNodes) const;
 	// Returns the set of components obtained by removing the given node set
 	vector<NodeSet> getComponents(const set<Node>& removedNodes) const;
+	// Returns the set of components obtained by removing the given node set
+	vector<NodeSet> getComponents(const NodeSet& removedNodes) const;
+	// Returns all the nodes reachable from the node after removing
+	// the removedNodes from the graph
+	set<Node> getComponent(Node v, const set<Node>& removedNodes);
 	// Prints the graph
-	void print();
+	void print() const;
 };
 
 } /* namespace tdenum */

@@ -43,6 +43,9 @@ class MaximalIndependentSetsEnumerator {
 	bool newSetFound(const set<T>& set);
 	bool runFullEnumeration();
 public:
+	MaximalIndependentSetsEnumerator(const MaximalIndependentSetsEnumerator& m) :
+		graph(m.graph), extender(m.extender), scorer(m.scorer){}
+	MaximalIndependentSetsEnumerator& operator=(const MaximalIndependentSetsEnumerator& a){return *this;}
 	/**
 	 * Initialization. Receives a succinct graph representation with an
 	 * independent set expansion.
