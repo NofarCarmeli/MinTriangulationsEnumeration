@@ -2,11 +2,17 @@
 
 Implements enumeration of all minimal triangulations of a graph as described in the paper [On the Enumeration of all Minimal Triangulations](http://arxiv.org/abs/1604.02833).
 
+## Compilation
+Run:
+```
+make
+```
+
 ## Input
 
-Specify input file as the first argument, and possibly other configuration options using command line arguments. e.g:
+Specify the input file as the first argument, and possibly other configuration options using command line arguments. e.g:
 ```
-./MinTriangulationsEnumeration C:\Graph\1.uai time_limit=30 alg=fill
+enumerator.exe example_input_TPCH9.bliss time_limit=1 alg=mcs
 ```
 Only the input file is required.
 

@@ -1,0 +1,18 @@
+c converted tpc-h query - hypergraph
+p edge 19 16
+e 1 2 3
+e 11 12 13
+e 6 8 10
+e 6 8 11
+e 5 6
+e 6 8 12
+e 9 18 19
+e 10 13 17
+e 15 16 17
+e 6 7 8
+e 4 11
+e 3 5
+e 6 8 9
+e 2 4
+e 7 16 18
+e 12 14
