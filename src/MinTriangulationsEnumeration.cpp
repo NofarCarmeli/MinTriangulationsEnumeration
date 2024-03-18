@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
 	TriangulationAlgorithm heuristic = MCS_M;
 	TriangulationScoringCriterion triangulationsOrder = NONE;
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
+	OutputForm outputForm = TRIANGULATIONS;
 
 	// Read the parameters specified
 	for (int i=2; i<argc; i++) {
@@ -41,6 +42,15 @@ int main(int argc, char* argv[]) {
 			if (timeLimitInSeconds >= 0) {
 				isTimeLimited = true;
 			}
+		} else if (flagName == "output") {
+			if (flagValue == "triangulations") {
+				outputForm = TRIANGULATIONS;
+			} else if (flagValue == "bags") {
+				outputForm = BAGSETS;
+			} else {
+				cout << "Output form not recognized" << endl;
+				return 0;
+			}
 		} else if (flagName == "alg") {
 			if (flagValue == "mcs") {
 				heuristic = MCS_M;
@@ -48,7 +58,7 @@ int main(int argc, char* argv[]) {
 				heuristic = MIN_DEGREE_LB_TRIANG;
 			} else if (flagValue == "fill") {
 				heuristic = MIN_FILL_LB_TRIANG;
-			}  else if (flagValue == "initialDegree") {
+			} else if (flagValue == "initialDegree") {
 				heuristic = INITIAL_DEGREE_LB_TRIANG;
 			} else if (flagValue == "initialFill") {
 				heuristic = INITIAL_FILL_LB_TRIANG;
@@ -100,7 +110,7 @@ int main(int argc, char* argv[]) {
 	cout << setprecision(2);
 	cout << "Starting enumeration for " << inputFile << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, detailedOutput);
+	ResultsHandler results(g, detailedOutput, outputForm);
 	bool timeLimitExceeded = false;
 
 	// Generate the results and print details if asked for

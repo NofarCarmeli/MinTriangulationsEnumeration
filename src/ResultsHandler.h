@@ -35,9 +35,12 @@ public:
 	}
 };
 
+enum OutputForm { TRIANGULATIONS, BAGSETS };
+
 class ResultsHandler {
 	Graph inputGraph;
 	ostream& output;
+	OutputForm outputForm;
 	clock_t startTime;
 	ResultInformation minWidthResult;
 	ResultInformation minFillResult;
@@ -50,8 +53,8 @@ class ResultsHandler {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
 	}
 public:
-	ResultsHandler(const Graph& g, ostream& o) :
-				inputGraph(g), output(o),
+	ResultsHandler(const Graph& g, ostream& o, OutputForm f) :
+				inputGraph(g), output(o), outputForm(f),
 				minWidth(0), maxWidth(0), minFill(0), maxFill(0), minBagExpSize(0),
 				maxBagExpSize(0), resultsFound(0) {
 		startTime = clock();
@@ -91,8 +94,12 @@ public:
 
 		// Print triangulation
 		currentResult.printSummary(output);
-		output << "Fill edges:" << endl;
-		triangulation.printTriangulation(output, inputGraph);
+		if (outputForm == TRIANGULATIONS) {
+			triangulation.printTriangulation(output, inputGraph);
+		} else if (outputForm == BAGSETS) {
+			triangulation.printMaximalCliques(output);
+		}
+		output << " " << endl;
 	}
 	
 	void printReadableSummary(ostream& output) {

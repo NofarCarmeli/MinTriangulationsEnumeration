@@ -125,23 +125,16 @@ void ChordalGraph::printTriangulation(ostream& output, const Graph& origin) cons
 		Node v = *(++it->begin());
 		output << u << " " << v << endl;
 	}
-	output << " " << endl;
 }
 
 
-void ChordalGraph::printMaximumClique(ostream& output) const {
+void ChordalGraph::printMaximalCliques(ostream& output) const {
 	set<NodeSet> maximalCliques = getMaximalCliques();
-	unsigned int maxSize = 0;
 	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
-		maxSize = maxSize < it->size() ? it->size() : maxSize;
-	}
-	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
-		if (it->size() == maxSize) {
-			for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
-				output << *jt << " ";
-			}
-			output << endl;
+		for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
+			output << *jt << " ";
 		}
+		output << endl;
 	}
 }
 
