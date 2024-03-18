@@ -55,15 +55,7 @@ Options are: size, fill, none. Default is none.
 * size - lowest size first.
 * fill - lowest number of pairs in the separator that don't share an edge.
 
-### Detailed Output
-Flag name: print.
-The results to print to a details file.
-Options are: all, none, improved. Default is none.
-* none - does not generate a details file.
-* all - prints all results.
-* improved - prints only results that show improvement in one of the measures printed.
-
 ## Output
 
-A summary of the results is printed to the screen and saved to a table in summary.csv in the current directory.
-Depending on the value of the Print flag, The full list of triangulations may be saved to a csv file in the current directory, with the name of the input file followed by the configuration options.
+The list of all fill edges of all triangulations found is stored in an output file with the name of the input file followed by ".out".
+A summary of the triangulations found is printed to the screen.

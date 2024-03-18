@@ -118,17 +118,18 @@ long long ChordalGraph::getExpBagsSize() const {
 }
 
 
-void ChordalGraph::printTriangulation(const Graph& origin) const {
+void ChordalGraph::printTriangulation(ostream& output, const Graph& origin) const {
 	vector< set<Node> > fillEdges = getFillEdges(origin);
 	for (vector< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
 		Node u = *(it->begin());
 		Node v = *(++it->begin());
-		cout << u << "-" << v << endl;
+		output << u << " " << v << endl;
 	}
+	output << " " << endl;
 }
 
 
-void ChordalGraph::printMaximumClique() const {
+void ChordalGraph::printMaximumClique(ostream& output) const {
 	set<NodeSet> maximalCliques = getMaximalCliques();
 	unsigned int maxSize = 0;
 	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
@@ -137,9 +138,9 @@ void ChordalGraph::printMaximumClique() const {
 	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
 		if (it->size() == maxSize) {
 			for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
-				cout << *jt << " ";
+				output << *jt << " ";
 			}
-			cout << endl;
+			output << endl;
 		}
 	}
 }

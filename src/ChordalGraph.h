@@ -29,9 +29,9 @@ public:
 	// Returns Sum_{MaximalCliques b}2^|b|
 	long long getExpBagsSize() const;
 	// Prints the edges in this graph and not in the origin
-	void printTriangulation(const Graph& origin) const;
+	void printTriangulation(ostream& output, const Graph& origin) const;
 	// Prints a clique of the largest size
-	void printMaximumClique() const;
+	void printMaximumClique(ostream& output) const;
 };
 
 } /* namespace tdenum */
