@@ -17,8 +17,9 @@ enumerator.exe example_input_TPCH9.bliss time_limit=1 alg=mcs
 Only the input file is required.
 
 ### Input File
-Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
-* csv - each line holds name of variables in a clique.
+Supported file formats are: hg, sp, wcnf, uai, bliss, and:
+* txt - each line holds names of variables in a clique separated by spaces (specifying an edge in every line also works).
+* csv - the same as txt but the values are separated by commas.
 
 ### Output Form
 Flag name: out.

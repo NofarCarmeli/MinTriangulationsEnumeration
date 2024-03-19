@@ -112,7 +112,7 @@ Graph readUAI(ifstream& input) {
 	return g;
 }
 
-Graph readCSV(ifstream& input) {
+Graph readCSV(ifstream& input, char separator) {
 	map <string,int> nodeNames;
 	vector < vector<int> > edges;
 	// Get nodes and edges
@@ -121,7 +121,7 @@ Graph readCSV(ifstream& input) {
 		istringstream lineStream(line);
 		string nodeName;
 		vector<int> edge;
-		while (getline(lineStream, nodeName, ',' )) {
+		while (getline(lineStream, nodeName, separator)) {
 			if ( nodeName.size() && nodeName[nodeName.size()-1] == '\r' ) {
 				nodeName = nodeName.substr( 0, nodeName.size() - 1 );
 			}
@@ -198,7 +198,9 @@ Graph GraphReader::read(const string& fileName) {
 	} else if ( extension == "uai" ) {
 		return readUAI(input);
 	} else if ( extension == "csv" ) {
-		return readCSV(input);
+		return readCSV(input, ',');
+	} else if ( extension == "txt" ) {
+		return readCSV(input, ' ');
 	} else if ( extension == "bliss") {
 		return readBliss(input);
 	}
