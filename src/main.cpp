@@ -22,7 +22,9 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	string inputFile = argv[1];
-	Graph g = GraphReader::read(inputFile);
+	pair<Graph, map <int,string> > graphInfo = GraphReader::read(inputFile);
+	Graph g = graphInfo.first;
+	map <int,string> inputNaming = graphInfo.second;
 
 	// Define the default parameters
 	bool isTimeLimited = false;
@@ -110,7 +112,7 @@ int main(int argc, char* argv[]) {
 	cout << setprecision(2);
 	cout << "Starting enumeration for " << inputFile << endl;
 	clock_t startTime = clock();
-	ResultsHandler results(g, detailedOutput, outputForm);
+	ResultsHandler results(g, detailedOutput, outputForm, inputNaming);
 	bool timeLimitExceeded = false;
 
 	// Generate the results and print details if asked for

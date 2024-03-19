@@ -2,13 +2,16 @@
 #define GRAPHREADER_H_
 
 #include "Graph.h"
+#include <map>
 
 namespace tdenum {
 
 class GraphReader {
 public:
 	/**
-	 * Reads a graph from the specified file. Supported options:
+	 * Reads a graph from the specified file.
+	 * Returns the graph and a map from the vertex numbers to their input names.
+	 * Supported options:
 	 * 1. DIMACS format
 	 * 2. a Markov network in the UAI format
 	 * 3. First line is expected to have the number of nodes and then the number
@@ -22,7 +25,7 @@ public:
 	 * Other lines specify edges "e <node> <another-node>".
 	 * Where all nodes are numbers between 1 and <number-of-nodes>.
 	 */
-	static Graph read(const string& fileName);
+	static pair<Graph, map <int,string> > read(const string& fileName);
 };
 
 } /* namespace tdenum */

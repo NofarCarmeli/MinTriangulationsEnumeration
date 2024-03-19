@@ -28,10 +28,6 @@ public:
 	int getTreeWidth() const;
 	// Returns Sum_{MaximalCliques b}2^|b|
 	long long getExpBagsSize() const;
-	// Prints the edges in this graph and not in the origin
-	void printTriangulation(ostream& output, const Graph& origin) const;
-	// Prints the maximal cliques with respect to set inclusion
-	void printMaximalCliques(ostream& output) const;
 };
 
 } /* namespace tdenum */

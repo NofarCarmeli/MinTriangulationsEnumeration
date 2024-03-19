@@ -117,25 +117,4 @@ long long ChordalGraph::getExpBagsSize() const {
 	return result;
 }
 
-
-void ChordalGraph::printTriangulation(ostream& output, const Graph& origin) const {
-	vector< set<Node> > fillEdges = getFillEdges(origin);
-	for (vector< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
-		Node u = *(it->begin());
-		Node v = *(++it->begin());
-		output << u << " " << v << endl;
-	}
-}
-
-
-void ChordalGraph::printMaximalCliques(ostream& output) const {
-	set<NodeSet> maximalCliques = getMaximalCliques();
-	for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
-		for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
-			output << *jt << " ";
-		}
-		output << endl;
-	}
-}
-
 } /* namespace tdenum */

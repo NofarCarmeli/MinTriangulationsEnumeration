@@ -4,12 +4,21 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <utility>
 
 using namespace std;
 
 namespace tdenum {
 
-Graph readCliques(ifstream& input) {
+map<int,string> getIdentityMapping(int size) {
+	map<int,string> m;
+	for (int i=0; i<size; i++) {
+		m[i]=to_string(i);
+	}
+	return m;
+}
+
+pair<Graph,map<int,string> > readCliques(ifstream& input) {
 	// Get numbers of variables and clauses
 	string line;
 	getline(input, line);
@@ -31,10 +40,10 @@ Graph readCliques(ifstream& input) {
 		}
 		g.addClique(clique);
 	}
-	return g;
+	return pair<Graph,map<int,string> > {g,getIdentityMapping(numberOfNodes)};
 }
 
-Graph readCnf(ifstream& input) {
+pair<Graph,map<int,string> > readCnf(ifstream& input) {
 	string line;
 	getline(input, line);
 	// Skip comments
@@ -50,7 +59,7 @@ Graph readCnf(ifstream& input) {
 		isWeighted = true;
 	} else {
 		cout << "Parsing error" << endl;
-		return Graph();
+		return pair<Graph,map<int,string> > ();
 	}
 	// Skip beginning of line ("p wcnf "), and get numbers of variables and clauses.
 	while (lineStream.peek() > '9' || lineStream.peek() < '0') {
@@ -76,10 +85,10 @@ Graph readCnf(ifstream& input) {
 		}
 		g.addClique(clique);
 	}
-	return g;
+	return pair<Graph,map<int,string> > {g,getIdentityMapping(numberOfNodes)};
 }
 
-Graph readUAI(ifstream& input) {
+pair<Graph,map<int,string> > readUAI(ifstream& input) {
 	// Ignore the line "MARKOV"
 	string line;
 	getline(input, line);
@@ -109,11 +118,12 @@ Graph readUAI(ifstream& input) {
 		}
 		g.addClique(clique);
 	}
-	return g;
+	return pair<Graph,map<int,string> > {g,getIdentityMapping(numberOfNodes)};
 }
 
-Graph readCSV(ifstream& input, char separator) {
-	map <string,int> nodeNames;
+pair<Graph,map<int,string> > readCSV(ifstream& input, char separator) {
+	map <string,int> nodeNameToNumber;
+	map <int,string> nodeNumberToName;
 	vector < vector<int> > edges;
 	// Get nodes and edges
 	string line;
@@ -125,11 +135,12 @@ Graph readCSV(ifstream& input, char separator) {
 			if ( nodeName.size() && nodeName[nodeName.size()-1] == '\r' ) {
 				nodeName = nodeName.substr( 0, nodeName.size() - 1 );
 			}
-			map<string,int>::iterator nameSearchResult = nodeNames.find(nodeName);
+			map<string,int>::iterator nameSearchResult = nodeNameToNumber.find(nodeName);
 			int nodeNumber;
-			if (nameSearchResult == nodeNames.end()) {
-				nodeNumber = nodeNames.size();
-				nodeNames[nodeName] = nodeNumber;
+			if (nameSearchResult == nodeNameToNumber.end()) {
+				nodeNumber = nodeNameToNumber.size();
+				nodeNameToNumber[nodeName] = nodeNumber;
+				nodeNumberToName[nodeNumber] = nodeName;
 			} else {
 				nodeNumber = nameSearchResult->second;
 			}
@@ -138,14 +149,14 @@ Graph readCSV(ifstream& input, char separator) {
 		edges.push_back(edge);
 	}
 	// Construct graph
-	Graph g(nodeNames.size());
+	Graph g(nodeNameToNumber.size());
 	for (int i=0; i<(int)edges.size(); i++) {
 		g.addClique(edges[i]);
 	}
-	return g;
+	return pair<Graph,map<int,string> > {g,nodeNumberToName};
 }
 
-Graph readBliss(ifstream& input) {
+pair<Graph,map<int,string> > readBliss(ifstream& input) {
 	string line;
 	getline(input, line);
 	// Skip comments
@@ -175,7 +186,7 @@ Graph readBliss(ifstream& input) {
 		}
 		g.addClique(clique);
 	}
-	return g;
+	return pair<Graph,map<int,string> > {g,getIdentityMapping(numberOfNodes)};
 }
 
 string GetFileExtension(const string& fileName) {
@@ -184,11 +195,11 @@ string GetFileExtension(const string& fileName) {
     return "";
 }
 
-Graph GraphReader::read(const string& fileName) {
+pair<Graph,map<int,string> > GraphReader::read(const string& fileName) {
 	ifstream input (fileName.c_str());
 	if (!input.is_open()) {
 		cout << "Unable to open file" << endl;
-		return Graph();
+		return pair<Graph,map<int,string> > ();;
 	}
 	string extension = GetFileExtension(fileName);
 	if ( extension == "hg" || extension == "sp") {
@@ -205,7 +216,7 @@ Graph GraphReader::read(const string& fileName) {
 		return readBliss(input);
 	}
 	cout << "Unrecognized file extension" << endl;
-	return Graph();
+	return pair<Graph,map<int,string> > ();
 }
 
 } /* namespace tdenum */

@@ -47,12 +47,25 @@ namespace tdenum {
 			}
 		}
 
-		// Print triangulation
+		// Print result
 		currentResult.printSummary(output);
 		if (outputForm == TRIANGULATIONS) {
-			triangulation.printTriangulation(output, inputGraph);
+			// Print fill edges
+			vector< set<Node> > fillEdges = triangulation.getFillEdges(inputGraph);
+			for (vector< set<Node> >::iterator it=fillEdges.begin(); it!=fillEdges.end(); ++it) {
+				Node u = *(it->begin());
+				Node v = *(++it->begin());
+				output << inputNaming[u] << " " << inputNaming[v] << endl;
+			}
 		} else if (outputForm == BAGSETS) {
-			triangulation.printMaximalCliques(output);
+			// Print bags
+			set<NodeSet> maximalCliques = triangulation.getMaximalCliques();
+			for (set<NodeSet>::const_iterator it=maximalCliques.begin(); it!=maximalCliques.end(); ++it) {
+				for (NodeSet::const_iterator jt = it->begin(); jt!=it->end(); ++jt) {
+					output << inputNaming[*jt] << " ";
+				}
+				output << endl;
+			}
 		}
 		output << " " << endl;
 	}

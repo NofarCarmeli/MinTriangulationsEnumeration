@@ -7,6 +7,7 @@
 
 #include <ostream>
 #include <ctime>
+#include <map>
 #include "ChordalGraph.h"
 using namespace std;
 
@@ -43,6 +44,7 @@ class ResultsHandler {
 	ResultInformation minWidthResult;
 	ResultInformation minFillResult;
 	ResultInformation minBagExpSizeResult;
+	map<int,string> inputNaming;
 	int minWidth, maxWidth;
 	int minFill, maxFill;
 	long long minBagExpSize, maxBagExpSize;
@@ -51,8 +53,8 @@ class ResultsHandler {
 		return double(clock() - startTime) / CLOCKS_PER_SEC;
 	}
 public:
-	ResultsHandler(const Graph& g, ostream& o, OutputForm f) :
-				inputGraph(g), output(o), outputForm(f),
+	ResultsHandler(const Graph& g, ostream& o, OutputForm f, map<int,string> n ) :
+				inputGraph(g), output(o), outputForm(f), inputNaming(n),
 				minWidth(0), maxWidth(0), minFill(0), maxFill(0), minBagExpSize(0),
 				maxBagExpSize(0), resultsFound(0) {
 		startTime = clock();

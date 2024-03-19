@@ -18,7 +18,7 @@ Only the input file is required.
 
 ### Input File
 Supported file formats are: hg, sp, wcnf, uai, bliss, and:
-* txt - each line holds names of variables in a clique separated by spaces (specifying an edge in every line also works).
+* txt - each line holds names of vertices in a clique separated by spaces (specifying an edge in every line also works). A vertex name can be any string without whitespaces.
 * csv - the same as txt but the values are separated by commas.
 
 ### Output Form
