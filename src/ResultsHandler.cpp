@@ -20,7 +20,7 @@ namespace tdenum {
 		int fill = currentResult.getFill();
 		long long bagExpSize = currentResult.getExpBagSize();
 		
-		// store metrics ranges
+		// maintain metrics ranges
 		if (resultsFound == 1) {
 			minBagExpSizeResult = minFillResult = minWidthResult = currentResult;
 			minWidth = maxWidth = width;
@@ -59,7 +59,7 @@ namespace tdenum {
 
 	void ResultsHandler::printReadableSummary(ostream& output) {
 		// Print count and metrics ranges
-		output << resultsFound << " triangulation were found in " << getTime() << " seconds (";
+		output << resultsFound << " triangulations were found in " << getTime() << " seconds (";
 		if (minWidth == maxWidth) {
 			output << "Width " << minWidth << ", ";
 		} else {
@@ -78,7 +78,7 @@ namespace tdenum {
 		}
 		output <<endl;
 
-		// Recommend triangulations
+		// Recommend results
 		if (resultsFound > 1) {
 			output << "Recommended results:" << endl;
 			minBagExpSizeResult.printSummary(output);

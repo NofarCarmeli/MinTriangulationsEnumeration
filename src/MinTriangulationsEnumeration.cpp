@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 			if (timeLimitInSeconds >= 0) {
 				isTimeLimited = true;
 			}
-		} else if (flagName == "output") {
+		} else if (flagName == "out") {
 			if (flagValue == "triangulations") {
 				outputForm = TRIANGULATIONS;
 			} else if (flagValue == "bags") {

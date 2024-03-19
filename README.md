@@ -20,6 +20,13 @@ Only the input file is required.
 Supported file formats are: hg, sp, wcnf, uai, csv, bliss.
 * csv - each line holds name of variables in a clique.
 
+### Output Form
+Flag name: out.
+Specifies the type of results that the algorithm enumerates.
+Options are: triangulations, bags. Default is triangulations.
+* triangulations - enumerates the minimal triangulations (a.k.a. chordal completions) of the input graph; each result is a list of fill edges (the edges to be added to the input graph).
+* bags - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags.
+
 ### Time Limit
 Flag name: time_limit.
 The next result after this specified time will be the last. Time is specified in seconds.
@@ -57,5 +64,5 @@ Options are: size, fill, none. Default is none.
 
 ## Output
 
-The list of all fill edges of all triangulations found is stored in an output file with the name of the input file followed by ".out".
+The list of results is stored in an output file with the name of the input file followed by ".out".
 A summary of the triangulations found is printed to the screen.
