@@ -3,9 +3,13 @@
 Implements enumeration of all minimal triangulations of a graph as described in the paper [On the Enumeration of all Minimal Triangulations](http://arxiv.org/abs/1604.02833).
 
 ## Compilation
-Run:
+To compile, run:
 ```
 make
+```
+Alternatively, if you prefer not to use make or you do not want to store intermediate files, you can simply run:
+```
+g++ -o enumerator.exe src/*
 ```
 
 ## Input
