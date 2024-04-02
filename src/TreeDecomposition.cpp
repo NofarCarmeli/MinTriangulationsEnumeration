@@ -1,5 +1,5 @@
-#include <TreeDecomposition.h>
-#include <DataStructures.h>
+#include "TreeDecomposition.h"
+#include "DataStructures.h"
 
 namespace tdenum {
 
