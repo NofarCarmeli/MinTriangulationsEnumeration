@@ -3,6 +3,7 @@
  */
 
 #include "ResultsHandler.h"
+#include "TreeDecomposition.h"
 #include <ostream>
 #include <ctime>
 using namespace std;
@@ -66,6 +67,10 @@ namespace tdenum {
 				}
 				output << endl;
 			}
+		} else if (outputForm == DECOMPOSITIONS) {
+			// Print bags
+			TreeDecomposition td (triangulation.getMaximalCliques());
+			td.print(output, inputNaming);
 		}
 		output << " " << endl;
 	}

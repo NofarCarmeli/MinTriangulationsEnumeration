@@ -16,7 +16,8 @@ using namespace tdenum;
  * Further parameters are optional flags.
  */
 int main(int argc, char* argv[]) {
-	// Parse input graph file
+	
+	// Parse the input graph file
 	if (argc < 2) {
 		cout << "No graph file specified" << endl;
 		return 0;
@@ -33,8 +34,7 @@ int main(int argc, char* argv[]) {
 	TriangulationScoringCriterion triangulationsOrder = NONE;
 	SeparatorsScoringCriterion separatorsOrder = UNIFORM;
 	OutputForm outputForm = TRIANGULATIONS;
-
-	// Read the parameters specified
+	// Read the input parameters
 	for (int i=2; i<argc; i++) {
 		string argument = argv[i];
 		string flagName = argument.substr(0, argument.find_last_of("="));
@@ -49,6 +49,8 @@ int main(int argc, char* argv[]) {
 				outputForm = TRIANGULATIONS;
 			} else if (flagValue == "bags") {
 				outputForm = BAGSETS;
+			} else if (flagValue == "decompositions") {
+				outputForm = DECOMPOSITIONS;
 			} else {
 				cout << "Output form not recognized" << endl;
 				return 0;
@@ -103,19 +105,16 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	// Open output file
+	// Open the output file
 	ofstream detailedOutput;
 	string outputFileName = inputFile + ".out";
 	detailedOutput.open(outputFileName.c_str());
-
-	// Initialize variables
+	// Generate the results and print the details to the output file
 	cout << setprecision(2);
 	cout << "Starting enumeration for " << inputFile << endl;
 	clock_t startTime = clock();
 	ResultsHandler results(g, detailedOutput, outputForm, inputNaming);
 	bool timeLimitExceeded = false;
-
-	// Generate the results and print details if asked for
 	MinimalTriangulationsEnumerator enumerator(g, triangulationsOrder, separatorsOrder, heuristic);
 	int i=1;
 	while (enumerator.hasNext()) {
@@ -127,17 +126,17 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
-	
-	// Close output file
+	// Close the output file
 	detailedOutput.close();
 
-	// Print summary to standard output
+	// Print a summary to standard output
 	if (timeLimitExceeded) {
 		cout << "Time limit reached." << endl;
 	} else {
 		cout << "All minimal triangulations were generated!" << endl;
 	}
 	results.printReadableSummary(cout);
+	cout << "The detailed output was stored in the file " << outputFileName << endl;
 
 	return 0;
 }

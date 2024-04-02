@@ -11,9 +11,9 @@ namespace tdenum {
  */
 ChordalGraph Converter::minimalSeparatorsToTriangulation(const Graph& g,
 		const set<MinimalSeparator>& minimalSeparators) {
-	ChordalGraph triangulation(g);
+	Graph triangulation(g);
 	triangulation.saturateNodeSets(minimalSeparators);
-	return triangulation;
+	return ChordalGraph(triangulation);
 }
 
 /*

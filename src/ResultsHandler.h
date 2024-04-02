@@ -34,7 +34,7 @@ public:
 	void printSummary(ostream& output);
 };
 
-enum OutputForm { TRIANGULATIONS, BAGSETS };
+enum OutputForm { TRIANGULATIONS, BAGSETS, DECOMPOSITIONS };
 
 class ResultsHandler {
 	Graph inputGraph;
