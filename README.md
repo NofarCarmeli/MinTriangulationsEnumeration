@@ -9,7 +9,7 @@ make
 ```
 Alternatively, if you prefer not to use make or you do not want to store intermediate files, you can simply run:
 ```
-g++ -o enumerator.exe src/*
+g++ -o enumerator.exe src/*.cpp
 ```
 
 ## Input
@@ -29,9 +29,9 @@ The supported file formats are: hg, sp, wcnf, uai, bliss, and:
 Flag name: out.
 Specifies the type of results that the algorithm enumerates.
 The options are: tri, bags, tds. Default is tri. The default is tri.
-* tri - enumerates the minimal triangulations (a.k.a. chordal completions) of the input graph; each result is a list of fill edges (the edges to be added to the input graph).
+* triang - enumerates the minimal triangulations (a.k.a. chordal completions) of the input graph; each result is a list of fill edges (the edges to be added to the input graph).
 * bags - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags.
-* tds - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags followed by a list of edges between the bags. (This lists all tree decompositions that cannot be improved by removing or splitting a bag, except it does not produce two decompositions with the same set of bags.)
+* TDs - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags followed by a list of edges between the bags. (This lists all tree decompositions that cannot be improved by removing or splitting a bag, except it does not produce two decompositions with the same set of bags.)
 
 ### Time Limit
 Flag name: time_limit.

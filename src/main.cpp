@@ -45,11 +45,11 @@ int main(int argc, char* argv[]) {
 				isTimeLimited = true;
 			}
 		} else if (flagName == "out") {
-			if (flagValue == "triangulations") {
+			if (flagValue == "triang") {
 				outputForm = TRIANGULATIONS;
 			} else if (flagValue == "bags") {
 				outputForm = BAGSETS;
-			} else if (flagValue == "decompositions") {
+			} else if (flagValue == "TDs") {
 				outputForm = DECOMPOSITIONS;
 			} else {
 				cout << "Output form not recognized" << endl;
@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 
 	// Open the output file
 	ofstream detailedOutput;
-	string outputFileName = inputFile + ".out";
+	string outputFileName = inputFile.substr(0, inputFile.find_last_of(".")) + "_out.txt";
 	detailedOutput.open(outputFileName.c_str());
 	// Generate the results and print the details to the output file
 	cout << setprecision(2);
