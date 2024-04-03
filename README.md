@@ -28,10 +28,11 @@ The supported file formats are: hg, sp, wcnf, uai, bliss, and:
 ### Output Form
 Flag name: out.
 Specifies the type of results that the algorithm enumerates.
-The options are: triang, bags, TDs. The default is triang.
+The options are: triang, bags, TDs, TDsAll. The default is triang.
 * triang - enumerates the minimal triangulations (a.k.a. chordal completions) of the input graph; each result is a list of fill edges (the edges to be added to the input graph).
 * bags - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags.
 * TDs - enumerates the equivalence classes of proper tree decompositions by bag sets; each result is a list of bags followed by a list of edges between the bags. (This lists all tree decompositions that cannot be improved by removing or splitting a bag, except it does not produce two decompositions with the same set of bags.)
+* TDsAll - enumerates the proper tree decompositions; each result is a list of bags followed by all options of a list of edges between the bags. (This lists all tree decompositions that cannot be improved by removing or splitting a bag, grouped by the set of bags.)
 
 ### Time Limit
 Flag name: time_limit.

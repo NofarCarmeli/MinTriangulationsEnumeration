@@ -50,7 +50,9 @@ int main(int argc, char* argv[]) {
 			} else if (flagValue == "bags") {
 				outputForm = BAGSETS;
 			} else if (flagValue == "TDs") {
-				outputForm = DECOMPOSITIONS;
+				outputForm = SINGLETDS;
+			} else if (flagValue == "TDsAll") {
+				outputForm = ALLTDS;
 			} else {
 				cout << "Output form not recognized" << endl;
 				return 0;

@@ -67,12 +67,16 @@ namespace tdenum {
 				}
 				output << endl;
 			}
-		} else if (outputForm == DECOMPOSITIONS) {
+		} else if (outputForm == SINGLETDS) {
 			// Print bags
 			TreeDecomposition td (triangulation.getMaximalCliques());
-			td.print(output, inputNaming);
+			td.printSingleTree(output, inputNaming);
+		} else if (outputForm == ALLTDS) {
+			// Print bags
+			TreeDecomposition td (triangulation.getMaximalCliques());
+			td.printAllEdgeOptions(output, inputNaming);
 		}
-		output << " " << endl;
+		output << endl;
 	}
 
 	void ResultsHandler::printReadableSummary(ostream& output) {
