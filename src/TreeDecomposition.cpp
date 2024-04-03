@@ -102,6 +102,8 @@ namespace tdenum {
         return g.getComponents(NodeSet());
     }
 
+    // Implementing an adaptation of an algorithm from the paper:
+    // Listing all the minimum spanning trees in an undirected graph by Takeo Yamada, Seiji Kataoka, and Kohtaro Watanabe.
     void TreeDecomposition::makeAllTreeEdgeOptionsAux(vector<Edge> tree, int minModifiableIndex, set<Edge> forbiddenEdges) {
         for (int modifiedIndex = minModifiableIndex; modifiedIndex < tree.size(); modifiedIndex++) {
             Edge activeEdge = tree[modifiedIndex];
